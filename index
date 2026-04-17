@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050508">
+<title>Mafia Life</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--bg:#050508;--bg2:#0a0a10;--c1:#0f0f18;--c2:#141420;--s1:#1a1a2c;--bd:#222240;--t1:#dddcf0;--t2:#7c7a98;--t3:#4a485c;--gd:#f0c020;--gd2:#a88010;--gd3:#604808;--rd:#e82020;--rd2:#a01414;--gn:#20c850;--gn2:#148838;--bl:#2060e0;--cy:#20b8d0;--ht:#e84808;--pp:#8030d0;--w:#fff;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--t1);min-height:100dvh;overscroll-behavior:none;font-size:13px}
+#W{max-width:430px;margin:0 auto;background:var(--bg);min-height:100dvh}
+#TB{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--bd)}
+#TH{display:flex;justify-content:space-between;align-items:center;padding:calc(var(--st)+4px) 10px 3px}
+#TL{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:var(--gd)}
+#TR{font-size:10px;color:var(--t3)}
+#TS{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--bd)}
+.st{background:var(--bg2);text-align:center;padding:4px 1px}
+.sl{font-size:7px;color:var(--t3);letter-spacing:.5px;font-weight:600}
+.sv{font-size:13px;font-weight:700;margin-top:1px}
+.sv-c{color:var(--gd)}.sv-h{color:var(--ht)}.sv-p{color:var(--gn)}.sv-r{color:var(--pp)}.sv-l{color:var(--t1)}
+.st.dng{animation:hp 1.2s ease infinite}@keyframes hp{0%,100%{background:var(--bg2)}50%{background:#140804}}
+#XB{height:2px;background:var(--c1)}#XF{height:100%;background:linear-gradient(90deg,var(--bl),var(--cy));transition:width .5s}
+.bar{background:var(--c1);border-radius:2px;height:4px;overflow:hidden;margin:2px 0}.bf{height:100%;border-radius:2px;transition:width .3s}
+#C{padding:6px 8px;padding-bottom:calc(72px + var(--sb))}.T{display:none}.T.A{display:block}
+#N{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--c1);border-top:1px solid var(--bd);z-index:100;display:flex;padding-bottom:var(--sb)}
+#N button{flex:1;padding:4px 1px 3px;background:none;color:var(--t3);border:0;font-size:7px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;letter-spacing:.3px}
+#N button i{font-size:16px;display:block;font-style:normal}
+#N button.A{color:var(--gd)}
+.sh{color:var(--gd);margin:12px 0 5px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;display:flex;align-items:center;gap:6px}.sh::after{content:'';flex:1;height:1px;background:var(--bd)}
+.cd{background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:10px;margin:4px 0;position:relative;overflow:hidden}
+.cd.gl{border-color:var(--gd3)}.cd.dn{border-color:var(--rd2)}
+.bt{display:block;width:100%;padding:10px 11px;margin:3px 0;background:var(--s1);color:var(--t1);border:1px solid var(--bd);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:left;transition:all .1s}
+.bt:active{transform:scale(.97);opacity:.85}
+.bt.go{background:linear-gradient(135deg,var(--gd3),var(--gd2));color:#000;border-color:var(--gd2)}
+.bt.dn{background:linear-gradient(135deg,var(--rd2),#c01818);color:var(--w);border-color:var(--rd)}
+.bt.sm{display:inline-block;width:auto;padding:4px 8px;font-size:10px;margin:2px}
+.bt:disabled{opacity:.2;pointer-events:none}
+.bt.ad{background:#141430;border-color:var(--pp);color:#c0a0ff}
+.ec{background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:9px;margin:3px 0;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .1s}
+.ec:active{transform:scale(.98);background:var(--c2)}
+.si{display:flex;align-items:center;gap:6px;padding:5px 7px;background:var(--c2);border:1px solid var(--bd);border-radius:6px;margin:2px 0}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:700;letter-spacing:.5px}
+.tg{background:rgba(240,192,32,.1);color:var(--gd);border:1px solid var(--gd3)}
+.tr{background:rgba(232,32,32,.1);color:var(--rd)}.tb{background:rgba(32,96,224,.1);color:var(--bl)}
+#OV{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;z-index:200;overflow-y:auto;padding:8px}
+#OV.A{display:flex;justify-content:center;align-items:flex-start}
+#OB{background:var(--c1);border:1px solid var(--bd);border-radius:12px;padding:14px;width:95%;max-width:380px;margin:auto}
+#RP{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:var(--c1);border:2px solid var(--gd2);border-radius:14px;padding:22px 16px;width:88%;max-width:320px;z-index:350;text-align:center;display:none;opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+#RP.show{display:block;opacity:1;transform:translate(-50%,-50%) scale(1)}
+#RX{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:340;display:none;opacity:0;transition:opacity .3s}#RX.show{display:block;opacity:1}
+.re{font-size:48px;margin-bottom:4px}.rt{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--gd);margin-bottom:6px}.rl{font-size:11px;margin:3px 0;color:var(--t2)}.rl b{color:var(--t1)}.rb{font-size:24px;font-weight:700;font-family:'Bebas Neue',sans-serif;color:var(--gd);margin:4px 0;letter-spacing:2px}
+.fn{position:fixed;pointer-events:none;font-family:'Bebas Neue',sans-serif;font-size:18px;font-weight:700;z-index:600;animation:fu 1s ease-out forwards;text-shadow:0 2px 6px rgba(0,0,0,.5)}
+@keyframes fu{0%{opacity:1;transform:translateY(0) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(.7)}}
+.fc{color:var(--gd)}.fx{color:var(--cy)}.fd{color:var(--rd)}.fh{color:var(--gn)}.ft{color:var(--ht)}
+.shake{animation:sk .2s ease}@keyframes sk{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+#NF{position:fixed;top:50px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--c2);color:var(--gd);padding:7px 16px;border-radius:18px;font-size:11px;font-weight:700;z-index:500;opacity:0;transition:all .3s;pointer-events:none;max-width:80%;text-align:center;border:1px solid var(--gd3)}
+#NF.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#CO{position:fixed;inset:0;background:rgba(5,5,8,.96);display:none;justify-content:center;align-items:center;z-index:200;padding:8px}
+#CP{background:var(--c1);border:2px solid var(--rd2);border-radius:12px;padding:10px;width:96%;max-width:390px}
+.cu{background:var(--c2);border:1px solid var(--bd);border-radius:6px;padding:5px;text-align:center;flex:1 1 55px;min-width:48px;max-width:90px;position:relative}
+.cu .ue{font-size:22px}.cu .un{font-size:7px;font-weight:700;margin:1px 0}.cu .uh{font-size:7px;color:var(--t3)}.cu.dead{opacity:.15;transform:scale(.85)}
+.ht{background:linear-gradient(135deg,#140404,#200808);border:1px solid var(--rd2);border-radius:8px;padding:9px;margin:4px 0}
+/* Block card */
+.blk{background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:9px;margin:3px 0;cursor:pointer;transition:all .1s}
+.blk:active{transform:scale(.98)}.blk.owned{border-left:3px solid var(--gd3)}.blk.rival{border-left:3px solid var(--rd2)}.blk.free{border-left:3px solid var(--t3)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--bd)}
+</style>
+</head>
+<body>
+<div id="W">
+<div id="TB"><div id="TH"><div id="TL">MAFIA LIFE</div><div id="TR"></div></div><div id="TS"></div><div id="XB"><div id="XF" style="width:0%"></div></div></div>
+<div id="C"><div id="hub-tab" class="T"></div><div id="jobs-tab" class="T"></div><div id="map-tab" class="T"></div><div id="crew-tab" class="T"></div><div id="you-tab" class="T"></div><div id="log-tab" class="T"></div></div>
+<div id="N">
+<button id="nb-hub" onclick="sw('hub')"><i>🏙</i>HUB</button>
+<button id="nb-jobs" onclick="sw('jobs')"><i>🔫</i>JOBS</button>
+<button id="nb-map" onclick="sw('map')"><i>🗺</i>TURF</button>
+<button id="nb-crew" onclick="sw('crew')"><i>👥</i>CREW</button>
+<button id="nb-you" onclick="sw('you')"><i>🤵</i>YOU</button>
+<button id="nb-log" onclick="sw('log')"><i>📋</i>LOG</button>
+</div>
+<div id="CO" style="display:none"><div id="CP"><div style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--rd);letter-spacing:3px;margin-bottom:5px;border-bottom:1px solid var(--bd);padding-bottom:3px">FIGHT</div><div id="EA" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px"></div><div id="AA" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px"></div><div id="CL" style="max-height:70px;overflow-y:auto;font-size:9px;background:var(--bg);color:var(--t3);border-radius:4px;padding:4px 6px;margin:3px 0;line-height:1.6"></div><div id="CA" style="display:flex;gap:3px;margin-top:3px"></div></div></div>
+<div id="OV"><div id="OB"></div></div>
+<div id="RX"></div><div id="RP"></div><div id="NF"></div>
+</div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e},rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,rA=a=>a[Math.floor(Math.random()*a.length)],R=()=>Math.random(),clone=o=>JSON.parse(JSON.stringify(o)),clamp=(v,l,h)=>Math.max(l,Math.min(h,v)),pct=(v,m)=>clamp(Math.round(v/m*100),0,100),fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':''+n;
+function notify(m){const n=$('NF');n.textContent=m;n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),1800)}
+function juice(t,a){const r=$('TS').getBoundingClientRect(),x=r.left+r.width/2+rnd(-25,25),y=r.top+15;const d=document.createElement('div');d.className='fn '+(t==='cash'?'fc':t==='xp'?'fx':t==='dmg'?'fd':t==='heal'?'fh':'ft');d.textContent=(t==='cash'?'+$':t==='dmg'?'-':t==='heal'?'+':'+')+a;d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1e3);if(t==='dmg')$('W').classList.add('shake'),setTimeout(()=>$('W').classList.remove('shake'),200)}
+function showR(title,emoji,lines,btn,fn,big){const rp=$('RP'),bg=$('RX');let h=`<div class="re">${emoji}</div><div class="rt">${title}</div>`;lines.forEach(l=>h+=`<div class="rl">${l}</div>`);if(big)h+=`<div class="rb">+$${fmt(big)}</div>`;h+=`<button class="bt go" style="margin-top:10px;text-align:center" onclick="closeR();${fn||''}">${btn||'OK'}</button>`;rp.innerHTML=h;rp.style.display='block';bg.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{rp.classList.add('show');bg.classList.add('show')}))}
+function closeR(){$('RP').classList.remove('show');$('RX').classList.remove('show');setTimeout(()=>{$('RP').style.display='none';$('RX').style.display='none'},200)}
+function openD(h){$('OB').innerHTML=h;$('OV').classList.add('A')}
+function closeD(){$('OV').classList.remove('A')}
+
+// ======================================================
+// PROCEDURAL GENERATION — THE CORE INNOVATION
+// ======================================================
+const CITY_PRE=["New ","San ","Port ","","","","",""];
+const CITY_NAMES=["Carbone","Valentino","Corsica","Palermo","Messina","Luciano","Ravenna","Torrino","Castellano","Marchetti","Savona","Navarro","Galante","Sienna","Verona","Calabria","Modena","Taranto"];
+const STREET_PRE=["Old ","East ","West ","North ","South ","Upper ","Lower ","Little ",""];
+const STREET_NAMES=["Vine St","Harbor Row","5th Ave","The Triangle","Mulberry Ln","Canal St","Ashton Blvd","Crescent Rd","Pike Alley","Ironworks","Bleecker","Mott St","Sullivan Pl","Prince Row","Baxter Ln","Cherry St","Hester","Pell St","Doyers","Bowery","Grand St","Orchard","Rivington","Ludlow","Essex","Broome","Spring St","Kenmare","Lafayette"];
+const BLOCK_TYPES=[
+{id:"commercial",n:"Commercial",e:"🏢",baseInc:15,baseHeat:0,risk:1,desc:"Shops and offices."},
+{id:"residential",n:"Residential",e:"🏘",baseInc:8,baseHeat:0,risk:0,desc:"Apartments and families."},
+{id:"industrial",n:"Industrial",e:"🏭",baseInc:12,baseHeat:1,risk:2,desc:"Factories and warehouses."},
+{id:"waterfront",n:"Waterfront",e:"🚢",baseInc:18,baseHeat:1,risk:2,desc:"Docks and shipping."},
+{id:"nightlife",n:"Nightlife",e:"🌃",baseInc:20,baseHeat:1,risk:1,desc:"Clubs and bars."},
+{id:"slum",n:"Slum",e:"🏚",baseInc:5,baseHeat:0,risk:3,desc:"Cheap and dangerous."}
+];
+const OPS=[
+{id:"drug_corner",n:"Drug Corner",e:"💊",inc:25,heat:3,risk:2,cost:100,desc:"Move product on the street."},
+{id:"protection",n:"Protection Racket",e:"💪",inc:20,heat:2,risk:1,cost:80,desc:"Businesses pay you."},
+{id:"gambling",n:"Gambling Spot",e:"🎰",inc:30,heat:1,risk:1,cost:200,desc:"Underground games."},
+{id:"chop",n:"Chop Shop",e:"🔧",inc:22,heat:2,risk:2,cost:150,desc:"Strip stolen cars."},
+{id:"front",n:"Front Business",e:"🏪",inc:15,heat:0,risk:0,cost:250,desc:"Launder money. No heat."},
+{id:"safehouse",n:"Safehouse",e:"🏠",inc:0,heat:-2,risk:0,cost:120,desc:"Heal here. Reduces heat."},
+{id:"lab",n:"Drug Lab",e:"🧪",inc:40,heat:4,risk:3,cost:400,desc:"Cook product. High profit."},
+{id:"arms_cache",n:"Arms Cache",e:"🔫",inc:35,heat:3,risk:3,cost:350,desc:"Supply guns."}
+];
+const TRAITS=["aggressive","cowardly","connected","corrupt","loyal","greedy","paranoid","ambitious"];
+
+// BUILDINGS — tied to block types
+const BLDS={
+bar:{n:"Bar",e:"🍺",am:["Whiskey and regret.","Jukebox plays something sad.","Smoke hangs heavy."]},
+diner:{n:"24hr Diner",e:"🍽",am:["Coffee's hot. Crowd's sketchy.","Grease and gossip."]},
+pawnshop:{n:"Pawn Shop",e:"💎",am:["Everything has a price.","Bars on the windows."]},
+guns:{n:"Gun Dealer",e:"🔫",am:["Back room hardware.","No serial numbers."]},
+hospital:{n:"Hospital",e:"🏥",am:["No questions asked.","Fluorescent hum."]},
+clinic:{n:"Street Doc",e:"💊",am:["No license. No records.","Vet who treats people."]},
+store:{n:"Corner Store",e:"🏪",am:["Bulletproof glass.","Lottery and energy drinks."]},
+club:{n:"Nightclub",e:"🎵",am:["VIP upstairs.","Strobes and bass."]},
+casino:{n:"Casino",e:"🎰",am:["Green felt, chip stacks.","House always wins."]},
+fence:{n:"The Fence",e:"🤝",am:["Cash for hot goods.","No questions."]},
+shark:{n:"Loan Shark",e:"🦈",am:["Need cash? With interest.","Pay on time."]},
+gym:{n:"Fight Gym",e:"🏋",am:["Iron and sweat.","Train or die soft."]},
+tattoo:{n:"Tattoo Shop",e:"🎨",am:["Ink tells stories.","Needle buzzes."]},
+hotel:{n:"Hotel",e:"🏨",am:["Clean rooms, dirty deals.","Penthouse meetings."]},
+bookie:{n:"Bookie",e:"📋",am:["Got the odds.","Big game tonight."]},
+garage:{n:"Garage",e:"🚗",am:["Custom rides.","Nitrous and plates."]},
+warehouse:{n:"Warehouse",e:"📦",am:["Crates. Nobody asks.","Echoes and shadows."]},
+recruiter:{n:"The Yard",e:"👥",am:["Muscle for hire.","Everyone has a price."]},
+chopshop:{n:"Chop Shop",e:"🔧",am:["Sparks fly.","Grease and adrenaline."]},
+druglab:{n:"Drug Lab",e:"🧪",am:["Chemical smell.","Hazmat checks the batch."]},
+safehouse_bld:{n:"Safehouse",e:"🏠",am:["Mattress. Clean guns.","Quiet. For now."]},
+};
+const BLOCK_BLDS={
+commercial:["bar","diner","pawnshop","hospital","fence","shark","hotel","recruiter"],
+residential:["store","clinic","bar","diner","garage"],
+industrial:["gym","guns","warehouse","chopshop","druglab","recruiter","safehouse_bld"],
+waterfront:["bar","diner","fence","warehouse","bookie","chopshop","recruiter"],
+nightlife:["club","casino","bar","tattoo","pawnshop","fence","bookie","hotel"],
+slum:["clinic","bar","diner","gym","store","shark","safehouse_bld"]
+};
+const FM=["Tony","Vinnie","Marco","Sal","Frankie","Nicky","Joey","Paulie","Carmine","Luca","Mikey","Rocco","Gino","Enzo","Dominic","Vito","Bruno","Sonny","Carlo","Tommy","Dante","Leo","Matteo","Silvio","Eddie","Bobby","Richie","Angelo","Ralph","Jimmy","Pete","Louie","Freddy","Benny","Mick","Dex","Ray"];
+const FF=["Sofia","Isabella","Val","Carmen","Rosa","Maria","Lucia","Adriana","Bianca","Elena","Gina","Nina","Angela","Carmela","Donna","Stella"];
+const LN=["Moretti","Russo","Ferraro","Colombo","Esposito","Ricci","Bianchi","Greco","Mancini","Lombardi","Caruso","DeLuca","Romano","Gallo","Vitale","Costa","Marchetti","Conti","Amato","Santoro","Rizzo","Leone","Falcone","Napoli","Fontana","Carbone","Salerno","Savino","Pastore","Valenti","DiMaggio","Torrino","Navarro"];
+const mkN=()=>(R()<.7?rA(FM):rA(FF))+' '+rA(LN);
+
+function genCity(){
+  const name=rA(CITY_PRE)+rA(CITY_NAMES);
+  // Generate blocks
+  const numBlocks=rnd(14,20);
+  const usedNames=new Set();
+  const blocks=[];
+  for(let i=0;i<numBlocks;i++){
+    let sn;do{sn=rA(STREET_PRE).trim()+(rA(STREET_PRE)?'':'')+rA(STREET_NAMES)}while(usedNames.has(sn));
+    usedNames.add(sn);
+    const type=rA(BLOCK_TYPES);
+    const owner=R()<.3?null:{name:mkN(),trait:rA(TRAITS),str:rnd(15,40+i*3),willSell:R()<.3,sellPrice:rnd(80,250),relation:0};
+    blocks.push({id:i,name:sn,type:type.id,typeData:type,owner,owned:false,op:null,opLv:1,soldiers:0,income:type.baseInc+rnd(-3,5),heat:type.baseHeat});
+  }
+  // Generate rival families — each owns 2-4 blocks
+  const families=[];
+  const famNames=[rA(LN),rA(LN),rA(LN)].filter((v,i,a)=>a.indexOf(v)===i);
+  while(famNames.length<3)famNames.push(rA(LN));
+  famNames.forEach((ln,fi)=>{
+    const bossName=rA(FM)+' '+ln;
+    const fam={name:'The '+ln+' Family',boss:bossName,bossHP:80+fi*40,bossMaxHP:80+fi*40,str:rnd(30,60)+fi*20,blocks:[],hostile:fi===0?true:false,respect:0};
+    // Assign blocks to this family
+    const available=blocks.filter(b=>!b.owned&&!b.owner);
+    const count=rnd(2,Math.min(4,available.length));
+    for(let j=0;j<count&&available.length;j++){
+      const b=available.splice(rnd(0,available.length-1),1)[0];
+      b.owner={name:rA(FM)+' '+ln,trait:rA(TRAITS),str:rnd(20,50),family:fi};
+      b.familyIdx=fi;
+      fam.blocks.push(b.id);
+    }
+    families.push(fam);
+  });
+  return{name,blocks,families};
+}
+
+// ======================================================
+// DATA — ITEMS, ENEMIES, CRIMES, CREW
+// ======================================================
+const ITEMS={
+knife:{n:"Switchblade",e:"🔪",t:"w",a:4,v:30},bat:{n:"Bat",e:"🏏",t:"w",a:5,v:40},pistol:{n:"Pistol",e:"🔫",t:"w",a:8,v:120},shotgun:{n:"Sawed-Off",e:"💥",t:"w",a:12,v:300},smg:{n:"SMG",e:"🔫",t:"w",a:16,v:600},rifle:{n:"Rifle",e:"🎯",t:"w",a:20,v:1200},
+vest:{n:"Vest",e:"🦺",t:"a",d:5,v:150},tactical:{n:"Tactical",e:"🎽",t:"a",d:9,v:400},armor:{n:"Armor",e:"🛡",t:"a",d:14,v:900},
+bandage:{n:"Bandage",e:"🩹",t:"c",heal:12,v:5},medkit:{n:"Med Kit",e:"💊",t:"c",heal:30,v:25},adrenaline:{n:"Adrenaline",e:"💉",t:"c",heal:60,v:70},
+drugs:{n:"Product",e:"📦",t:"g",v:50},jewelry:{n:"Jewelry",e:"💍",t:"g",v:80},cash_b:{n:"Cash Bundle",e:"💵",t:"g",v:120}
+};
+const ENEMIES={
+thug:{n:"Thug",e:"👊",hp:22,a:3,d:1,xp:4,g:8},dealer:{n:"Dealer",e:"💊",hp:28,a:4,d:2,xp:8,g:20},
+gang:{n:"Gangster",e:"🔫",hp:40,a:7,d:3,xp:14,g:30},hitman:{n:"Hitman",e:"🎯",hp:55,a:10,d:5,xp:25,g:50},
+cop:{n:"Cop",e:"👮",hp:32,a:5,d:5,xp:8,g:0},swat:{n:"SWAT",e:"🛡",hp:55,a:8,d:7,xp:18,g:0},
+enforcer:{n:"Enforcer",e:"💀",hp:48,a:8,d:4,xp:15,g:20},rival:{n:"Rival Soldier",e:"⚔",hp:35,a:6,d:3,xp:10,g:15},
+boss:{n:"Boss",e:"🤵",hp:90,a:14,d:9,xp:50,g:100},bouncer:{n:"Bouncer",e:"💪",hp:45,a:5,d:6,xp:10,g:15}
+};
+function mkE(type,extraScale){const t=ENEMIES[type]||ENEMIES.thug;const s=1+threatLv()*.05+(extraScale||0);return{name:t.n,e:t.e,hp:Math.round(t.hp*s),mhp:Math.round(t.hp*s),a:Math.round(t.a*s),d:Math.round(t.d*s),xp:t.xp,g:Math.round(t.g*s)}}
+
+const CRIMES=[
+{id:"pick",n:"Pickpocket",e:"🤏",tier:0,cash:[8,25],xp:4,ht:1,cd:0,base:88,fd:[0,2],fl:[0,3]},
+{id:"mug",n:"Mugging",e:"👊",tier:0,cash:[15,40],xp:6,ht:2,cd:0,base:80,fd:[2,6],fl:[0,5]},
+{id:"store",n:"Rob Store",e:"🏪",tier:0,cash:[25,70],xp:10,ht:4,cd:1,base:72,fd:[3,10],fl:[5,15]},
+{id:"car",n:"Boost Car",e:"🚗",tier:1,cash:[50,130],xp:14,ht:5,cd:1,base:68,fd:[3,10],fl:[0,0]},
+{id:"drug",n:"Drug Deal",e:"💊",tier:1,cash:[40,100],xp:12,ht:2,cd:1,base:75,fd:[2,8],fl:[10,25]},
+{id:"shake",n:"Shakedown",e:"💪",tier:1,cash:[60,140],xp:15,ht:3,cd:2,base:70,fd:[4,12],fl:[0,10]},
+{id:"burg",n:"Burglary",e:"🏠",tier:2,cash:[100,250],xp:22,ht:5,cd:3,base:55,fd:[5,15],fl:[10,30]},
+{id:"smug",n:"Smuggling",e:"🚢",tier:2,cash:[130,300],xp:25,ht:4,cd:3,base:55,fd:[5,20],fl:[20,50]},
+{id:"armor",n:"Armored Car",e:"🚐",tier:3,cash:[250,600],xp:40,ht:8,cd:4,base:42,fd:[10,25],fl:[30,80]},
+{id:"heist",n:"Bank Heist",e:"🏦",tier:3,cash:[400,1200],xp:60,ht:12,cd:5,base:38,fd:[15,35],fl:[50,100],multi:1},
+{id:"hit",n:"Contract Hit",e:"🎯",tier:4,cash:[600,2000],xp:90,ht:8,cd:5,base:35,fd:[20,40],fl:[0,0]},
+];
+
+const LT_TYPES=[
+{role:"Enforcer",e:"🛡",ab:"bodyguard",abD:"Blocks hits for you",bA:6,bD:8,bHP:55,wage:30},
+{role:"Consigliere",e:"🧠",ab:"insight",abD:"+15% crime success",bA:2,bD:3,bHP:30,wage:35},
+{role:"Hitman",e:"🎯",ab:"execute",abD:"Execute low-HP enemies",bA:12,bD:3,bHP:35,wage:40},
+{role:"Driver",e:"🚗",ab:"getaway",abD:"+30% escape, -1 heat",bA:3,bD:3,bHP:30,wage:25},
+{role:"Chemist",e:"🧪",ab:"purity",abD:"+40% drug profits",bA:1,bD:2,bHP:25,wage:32},
+{role:"Fixer",e:"🔧",ab:"fixer",abD:"-3 heat/day, cheaper bribes",bA:2,bD:3,bHP:28,wage:28},
+];
+
+// ======================================================
+// STATE
+// ======================================================
+let S=null,combat=null;
+const BASE={name:"",hp:50,mhp:50,xp:0,lv:1,cash:50,sp:0,atk:3,def:2,spd:3,
+gear:{w:null,a:null},inv:[],heat:0,
+circle:[],soldiers:0,
+city:null,// the procedural city
+respect:0,kills:0,crimes:0,earned:0,jails:0,
+crimeCD:{},day:1,log:[],
+combo:0,maxCombo:0,hotTip:null,
+prestige:0,lifetimeEarned:0,
+loan:0,workedDay:0,streak:0,lastPlayed:0,lastPay:0,
+pendingEvent:null,curBlock:0};
+
+function save(){try{localStorage.setItem('maf5',JSON.stringify(S))}catch(e){}}
+function load(){const d=localStorage.getItem('maf5');if(d){try{S=JSON.parse(d);return true}catch(e){}}return false}
+
+// ======================================================
+// CALCS
+// ======================================================
+function xpN(l){return 30+l*22}
+function getRank(){const R2=[{n:"Nobody",e:"🐀",l:1},{n:"Runner",e:"🏃",l:3},{n:"Soldier",e:"🔫",l:6},{n:"Capo",e:"💼",l:10},{n:"Underboss",e:"🥃",l:15},{n:"Boss",e:"👑",l:20},{n:"Don",e:"🎩",l:25}];for(let i=R2.length-1;i>=0;i--)if(S.lv>=R2[i].l)return R2[i];return R2[0]}
+function atkT(){let a=S.atk;const w=S.gear.w?ITEMS[S.gear.w]:null;if(w)a+=w.a;return a}
+function defT(){let d=S.def;const ar=S.gear.a?ITEMS[S.gear.a]:null;if(ar)d+=ar.d;return d}
+function threatLv(){return Math.floor((atkT()+defT()+S.lv*2+S.soldiers/4+S.respect/5)/5)}
+function hasAb(a){return S.circle.some(c=>c.hp>0&&c.ab===a)}
+function crimeBon(){return (hasAb('insight')?15:0)+Math.floor(S.respect/10)}
+function heatRedux(){return (hasAb('fixer')?3:0)+Math.floor(S.respect/25)}
+function comboM(){return 1+S.combo*.1}
+function prestigeM(){return 1+S.prestige*.1}
+function heatPen(){return S.heat>=80?.3:S.heat>=60?.15:S.heat>=40?.05:0}
+// Income from owned blocks
+function blockIncome(){if(!S.city)return 0;let t=0;S.city.blocks.filter(b=>b.owned).forEach(b=>{t+=b.income;if(b.op){const o=OPS.find(x=>x.id===b.op);if(o)t+=o.inc*(b.opLv||1)}});return Math.floor(t*(1-heatPen()))}
+function weeklyUp(){let u=0;S.circle.forEach(c=>u+=c.wage);u+=S.soldiers*10;if(S.loan>0)u+=Math.ceil(S.loan*.15);return u}
+function maxSoldiers(){return 5+S.lv*3+Math.floor(S.respect/2)}
+function ownedBlocks(){return S.city?S.city.blocks.filter(b=>b.owned).length:0}
+
+// ======================================================
+// LOGGING
+// ======================================================
+function log(t,type='n'){if(!S.log.length||S.log[0].day!==S.day)S.log.unshift({day:S.day,e:[]});S.log[0].e.push({t,type});if(S.log.length>50)S.log=S.log.slice(0,50)}
+
+// ======================================================
+// UI CORE
+// ======================================================
+let curTab='hub';
+function sw(tab){curTab=tab;document.querySelectorAll('.T').forEach(t=>t.classList.remove('A'));document.querySelectorAll('#N button').forEach(b=>b.classList.remove('A'));$(tab+'-tab')?.classList.add('A');$('nb-'+tab)?.classList.add('A');upTab(tab)}
+function upAll(){upStats();upTab(curTab);save()}
+function upStats(){
+  const r=getRank(),net=blockIncome()-weeklyUp();
+  $('TR').textContent=S.city?S.city.name+' · Day '+S.day+(S.combo>1?' · ×'+S.combo:''):'Day '+S.day;
+  $('TS').innerHTML=`<div class="st"><div class="sl">CASH</div><div class="sv sv-c">$${fmt(S.cash)}</div></div><div class="st${S.heat>=70?' dng':''}"><div class="sl">HEAT</div><div class="sv sv-h">${S.heat}%</div></div><div class="st"><div class="sl">HP</div><div class="sv sv-p">${S.hp}</div></div><div class="st"><div class="sl">REP</div><div class="sv sv-r">${S.respect}</div></div><div class="st"><div class="sl">${r.e}Lv${S.lv}</div><div class="sv sv-l">${r.n}</div></div>`;
+  $('XF').style.width=pct(S.xp,xpN(S.lv))+'%';
+}
+function upTab(t){({hub:upHub,jobs:upJobs,map:upMap,crew:upCrew,you:upYou,log:upLog})[t]?.()}
+
+// ======================================================
+// HUB — City overview + actions
+// ======================================================
+function upHub(){
+  const tab=$('hub-tab');tab.innerHTML='';
+  if(!S.city)return;
+
+  // Pending event
+  if(S.pendingEvent){const ev=S.pendingEvent;const ec=el('div','cd dn');ec.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--rd);letter-spacing:1px;margin-bottom:4px">${ev.title}</div><div style="font-size:11px;color:var(--t2);margin-bottom:6px">${ev.desc}</div>`;ev.opts.forEach((o,i)=>{const b=el('button','bt'+(i===0?' go':''),o.label);b.onclick=()=>{o.fn();S.pendingEvent=null;upAll()};ec.appendChild(b)});tab.appendChild(ec)}
+
+  // City card
+  const owned=ownedBlocks(),total=S.city.blocks.length;
+  const inc=blockIncome(),up=weeklyUp(),net=inc-up;
+  const cc=el('div','cd gl');
+  cc.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px">${S.city.name}</div><div style="display:flex;gap:8px;margin-top:6px;font-size:10px"><div style="flex:1;background:var(--bg);padding:5px;border-radius:4px;text-align:center"><div style="color:var(--t3)">Blocks</div><div style="font-weight:700;font-size:14px;color:var(--gd)">${owned}/${total}</div></div><div style="flex:1;background:var(--bg);padding:5px;border-radius:4px;text-align:center"><div style="color:var(--t3)">Net/wk</div><div style="font-weight:700;font-size:14px;color:${net>=0?'var(--gn)':'var(--rd)'}">${net>=0?'+':''}$${fmt(net)}</div></div><div style="flex:1;background:var(--bg);padding:5px;border-radius:4px;text-align:center"><div style="color:var(--t3)">Soldiers</div><div style="font-weight:700;font-size:14px">${S.soldiers}</div></div></div>${heatPen()>0?'<div style="font-size:9px;color:var(--rd);margin-top:4px">🔥 Heat penalty: -'+Math.round(heatPen()*100)+'% income</div>':''}`;
+  tab.appendChild(cc);
+
+  // Heat bar
+  const hc=el('div','cd'+(S.heat>=70?' dn':''));
+  hc.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span>🔥 Heat</span><span style="color:var(--ht)">${S.heat}%</span></div><div class="bar"><div class="bf" style="width:${S.heat}%;background:linear-gradient(90deg,var(--ht),var(--rd))"></div></div>`;
+  tab.appendChild(hc);
+
+  // Hot tip
+  if(S.hotTip&&S.hotTip.exp>S.day){const cr=CRIMES.find(c=>c.id===S.hotTip.crime);if(cr){const ht=el('div','ht');ht.innerHTML=`<div style="font-size:10px;color:var(--rd);font-weight:700;margin-bottom:2px">🔥 HOT TIP · ${S.hotTip.exp-S.day}d LEFT</div><div style="font-size:11px">${cr.e} ${cr.n} — <span style="color:var(--gd)">${S.hotTip.mult}×</span></div>`;const hb=el('button','bt dn','⚡ Go to Jobs');hb.onclick=()=>sw('jobs');ht.appendChild(hb);tab.appendChild(ht)}}
+
+  // Actions
+  tab.appendChild(el('div','sh','Actions'));
+  const lb=el('button','bt','😴 Lay Low · heal, -heat, combo resets');
+  lb.onclick=()=>{S.day++;S.workedDay=0;const h=rnd(10,20),hl=rnd(3,8)+heatRedux();S.hp=Math.min(S.mhp,S.hp+h);S.heat=Math.max(0,S.heat-hl);S.combo=0;S.circle.forEach(c=>c.hp=Math.min(c.mhp,c.hp+Math.floor(c.mhp*.2)));log('Laid low. +'+h+'HP -'+hl+' heat.','v');juice('heal',h);dayTick();upAll();showR('Laid Low','😴',['+'+h+' HP','-'+hl+' Heat','Combo reset'],'OK','')};
+  tab.appendChild(lb);
+
+  if(S.heat>=15){const bc=Math.floor(S.heat*(hasAb('fixer')?1.5:2.5));const bb=el('button','bt','🤝 Bribe cops $'+bc);bb.onclick=()=>{if(S.cash<bc)return notify('Need $'+bc);S.cash-=bc;const l=rnd(12,25);S.heat=Math.max(0,S.heat-l);log('Bribed cops. -'+l+' heat.','v');upAll()};tab.appendChild(bb)}
+
+  // Work
+  if(S.workedDay!==S.day){const pay=rnd(8,16)+S.lv*2;const jb=el('button','bt','💼 Day job · $'+pay);jb.onclick=()=>{S.workedDay=S.day;S.cash+=pay;S.earned+=pay;S.lifetimeEarned+=pay;S.xp+=2;juice('cash',pay);log('Worked. +$'+pay,'n');chkLU();upAll()};tab.appendChild(jb)}
+
+  // Recruit soldiers
+  if(S.soldiers<maxSoldiers()){const rc=25;const rb2=el('button','bt','🔫 Recruit soldier $'+rc);rb2.onclick=()=>{if(S.cash<rc)return notify('Need $'+rc);S.cash-=rc;S.soldiers++;upAll()};tab.appendChild(rb2)}
+
+  // Rival families
+  tab.appendChild(el('div','sh','Rival Families'));
+  S.city.families.forEach((f,fi)=>{
+    if(f.bossHP<=0)return;
+    const fc=el('div','cd'+(f.hostile?' dn':''));
+    const ownedByFam=S.city.blocks.filter(b=>b.familyIdx===fi&&!b.owned).length;
+    fc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:24px">${f.hostile?'⚔':'🤝'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${f.name}</div><div style="font-size:10px;color:var(--t3)">Boss: ${f.boss} · ${ownedByFam} blocks · Str ${f.str}</div></div></div><div style="margin-top:4px"><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3)"><span>Boss HP</span><span>${f.bossHP}/${f.bossMaxHP}</span></div><div class="bar"><div class="bf" style="width:${pct(f.bossHP,f.bossMaxHP)}%;background:var(--rd)"></div></div></div>`;
+    if(f.hostile&&S.lv>=(fi+1)*5){const ab=el('button','bt dn','⚔ Attack Boss');ab.onclick=()=>{const e=[mkE('boss',fi*.15)];if(fi>=1)e.push(mkE('hitman',fi*.1));startCombat(e,'fam_'+fi)};fc.appendChild(ab)}
+    else if(f.hostile){fc.appendChild(el('div','','<div style="font-size:9px;color:var(--t3);text-align:center;margin-top:3px">Req Lv'+(fi+1)*5+'</div>'))}
+    if(!f.hostile){const hb=el('button','bt','😤 Provoke war');hb.onclick=()=>{f.hostile=true;S.respect+=3;log('Declared war on '+f.name+'.','q');upAll()};fc.appendChild(hb)}
+    tab.appendChild(fc);
+  });
+
+  // CURRENT LOCATION — shows buildings based on block type
+  tab.appendChild(el('div','sh','Your Area'));
+  const curBlk=S.city.blocks[S.curBlock||0];
+  if(curBlk){
+    const locCard=el('div','cd');
+    locCard.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:24px">${curBlk.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:13px">${curBlk.name}</div><div style="font-size:10px;color:var(--t3)">${curBlk.typeData?.n||curBlk.type}${curBlk.owned?' · <span style="color:var(--gn)">YOUR TURF</span>':curBlk.familyIdx!==undefined?' · <span style="color:var(--rd)">'+S.city.families[curBlk.familyIdx]?.name+'</span>':''}</div></div></div>`;
+    // Move to different block
+    const mb=el('button','bt sm','📍 Change location');
+    mb.onclick=()=>{
+      let h='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gd);letter-spacing:2px;margin-bottom:8px">MOVE TO</div>';
+      S.city.blocks.forEach((b,i)=>{
+        if(i===S.curBlock)return;
+        const isOwned=b.owned;const isRival=b.familyIdx!==undefined&&!b.owned;
+        h+=`<button class="bt" style="text-align:left" onclick="S.curBlock=${i};closeD();upAll()"><span style="font-size:14px">${b.typeData?.e||'📍'}</span> ${b.name} <span style="font-size:9px;color:${isOwned?'var(--gn)':isRival?'var(--rd)':'var(--t3)'}">${isOwned?'YOURS':isRival?S.city.families[b.familyIdx]?.name||'Rival':'—'}</span></button>`;
+      });
+      h+='<button class="bt" style="text-align:center" onclick="closeD()">← Back</button>';
+      openD(h);
+    };
+    locCard.appendChild(mb);
+    tab.appendChild(locCard);
+
+    // Buildings available at this block type
+    const bldList=BLOCK_BLDS[curBlk.type]||[];
+    if(bldList.length){
+      tab.appendChild(el('div','sh','Locations'));
+      bldList.forEach(bId=>{
+        const b=BLDS[bId];if(!b)return;
+        const bc=el('div','ec');
+        bc.innerHTML=`<div style="font-size:20px">${b.e}</div><div style="flex:1"><div style="font-weight:600;font-size:12px">${b.n}</div></div><div style="color:var(--t3)">›</div>`;
+        bc.onclick=()=>openBld(bId);
+        tab.appendChild(bc);
+      });
+    }
+  }
+}
+
+// ======================================================
+// BUILDING INTERIORS
+// ======================================================
+function openBld(bId){
+  const b=BLDS[bId];if(!b)return;
+  const bi=$('BI');bi.innerHTML='';
+  bi.appendChild(Object.assign(el('div','bh'),{innerHTML:`<div class="bb" onclick="$('BO').classList.remove('A')">‹</div><div style="flex:1;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px">${b.e} ${b.n}</div><div style="font-size:11px;color:var(--gd)">$${fmt(S.cash)}</div>`}));
+  bi.appendChild(el('div','ba',rA(b.am)));
+  const body=el('div','bp');
+  const curBlk=S.city?.blocks[S.curBlock||0];
+  const isHome=curBlk?.owned;// cheaper prices on your turf
+
+  const F={bar:bBar,diner:bDiner,pawnshop:bPawn,guns:bGuns,hospital:bHeal,clinic:bHeal,store:bStore,club:bClub,casino:bCasino,fence:bFence,shark:bShark,gym:bGym,tattoo:bTattoo,hotel:bHotel,bookie:bBookie,garage:bGarage,warehouse:bWarehouse,recruiter:bRecruiter,chopshop:bChopshop,druglab:bDruglab,safehouse_bld:bSafehouse};
+  (F[bId]||(()=>body.appendChild(el('div','','<div style="font-size:10px;color:var(--t3)">Nothing here yet.</div>'))))(body,isHome);
+
+  body.appendChild(el('button','bt','← Back'));body.lastChild.onclick=()=>$('BO').classList.remove('A');
+  bi.appendChild(body);$('BO').classList.add('A');
+}
+
+function bBar(body,home){
+  body.appendChild(el('div','bs','Drinks'));
+  const disc=home?.8:1;
+  [['🍺 Beer',2,5],['🥃 Whiskey',5,12],['🍸 Top Shelf',12,22],['🍾 Champagne',25,38]].forEach(([n,c,h])=>{c=Math.ceil(c*disc);const btn=el('button','bt',n+' $'+c+' · +'+h+'HP');btn.onclick=()=>{if(S.cash<c)return notify('Need $'+c);S.cash-=c;S.hp=Math.min(S.mhp,S.hp+h);juice('heal',h);openBld('bar')};body.appendChild(btn)});
+  body.appendChild(el('div','bs','Rumor Mill'));
+  const rb=el('button','bt','👂 Buy tip $10');rb.onclick=()=>{if(S.cash<10)return notify('Need $10');S.cash-=10;const tips=["Shipment at the docks tonight.","Cop on 5th is on the take.","Rival boss is moving safehouse.","Armored car hits 3rd every Tuesday.","New product flooding in from overseas.","Someone put a bounty out on freelancers.","A warehouse on the east side is barely guarded.","The feds are sniffing around."];S.xp+=3;log('Tip: '+rA(tips),'q');chkLU();notify('Got a tip');$('BO').classList.remove('A')};body.appendChild(rb);
+  // Recruit inner circle from bars
+  if(S.circle.length<3){
+    body.appendChild(el('div','bs','Recruit Lieutenant'));
+    const lt=rA(LT_TYPES);const recruit={name:mkN(),role:lt.role,e:lt.e,ab:lt.ab,abD:lt.abD,a:lt.bA+rnd(0,Math.floor(S.lv/4)),d:lt.bD+rnd(0,Math.floor(S.lv/5)),hp:lt.bHP,mhp:lt.bHP,wage:lt.wage+Math.floor(S.lv/3)*5,loy:rnd(40,70),lv:1};
+    const cost=recruit.wage*6;
+    const rc=el('div','cd');rc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:22px">${recruit.e}</div><div style="flex:1"><div style="font-weight:700;font-size:11px">${recruit.name}</div><div style="font-size:9px;color:var(--t3)">${recruit.role} · ⚔${recruit.a} 🛡${recruit.d} · $${recruit.wage}/wk</div><div style="font-size:9px;color:var(--pp)">${recruit.abD}</div></div></div>`;
+    const hb=el('button','bt go','Hire $'+cost);hb.onclick=()=>{if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;S.circle.push(recruit);log('Hired '+recruit.name+'.','v');notify('Hired!');$('BO').classList.remove('A');upAll()};rc.appendChild(hb);body.appendChild(rc);
+  }
+}
+
+function bDiner(body,home){
+  const disc=home?.8:1;
+  [['🍔 Burger',4,7],['☕ Coffee',2,3],['🥪 Sandwich',3,5],['🥩 Steak',12,22]].forEach(([n,c,h])=>{c=Math.ceil(c*disc);const btn=el('button','bt',n+' $'+c+' · +'+h+'HP');btn.onclick=()=>{if(S.cash<c)return notify('Need $'+c);S.cash-=c;S.hp=Math.min(S.mhp,S.hp+h);juice('heal',h);openBld('diner')};body.appendChild(btn)});
+  if(R()<.35){const xp=rnd(3,8);body.appendChild(el('div','cd','<div style="font-size:10px;color:var(--t2)">💬 You overhear something useful. +'+xp+' XP</div>'));S.xp+=xp;chkLU()}
+}
+
+function bPawn(body,home){
+  body.appendChild(el('div','bs','Buy'));
+  const disc=home?.85:1;
+  [['knife',40],['bat',50],['hoodie',60],['bandage',8],['medkit',28],['lockpick',18]].forEach(([id,p])=>{p=Math.ceil(p*disc);const it=ITEMS[id];const btn=el('button','bt',it.e+' '+it.n+' $'+p+(it.t==='w'?' +'+it.a+'ATK':it.t==='a'?' +'+it.d+'DEF':''));btn.onclick=()=>{if(S.cash<p)return notify('Need $'+p);S.cash-=p;S.inv.push(id);notify('Bought');openBld('pawnshop')};body.appendChild(btn)});
+  body.appendChild(el('div','bs','Sell'));
+  const sell=S.inv.filter(id=>ITEMS[id]);
+  if(sell.length)sell.forEach(id=>{const it=ITEMS[id];const p=Math.floor(it.v*.6);const btn=el('button','bt',it.e+' '+it.n+' sell $'+p);btn.onclick=()=>{S.cash+=p;S.inv.splice(S.inv.indexOf(id),1);juice('cash',p);openBld('pawnshop')};body.appendChild(btn)});
+  else body.appendChild(el('div','','<div style="font-size:10px;color:var(--t3)">Nothing to sell.</div>'));
+}
+
+function bGuns(body,home){
+  body.appendChild(el('div','bs','Firearms'));
+  const disc=home?.85:1;
+  [['pistol',140],['revolver',170],['shotgun',320],['smg',600],['rifle',1250]].forEach(([id,p])=>{p=Math.ceil(p*disc);const it=ITEMS[id];const btn=el('button','bt',it.e+' '+it.n+' $'+p+' +'+it.a+'ATK');btn.onclick=()=>{if(S.cash<p)return notify('Need $'+p);S.cash-=p;S.inv.push(id);notify('Bought');openBld('guns')};body.appendChild(btn)});
+  body.appendChild(el('div','bs','Armor'));
+  [['vest',180],['tactical',450],['armor',950]].forEach(([id,p])=>{p=Math.ceil(p*disc);const it=ITEMS[id];const btn=el('button','bt',it.e+' '+it.n+' $'+p+' +'+it.d+'DEF');btn.onclick=()=>{if(S.cash<p)return notify('Need $'+p);S.cash-=p;S.inv.push(id);notify('Bought');openBld('guns')};body.appendChild(btn)});
+}
+
+function bHeal(body,home){
+  const disc=home?.7:1;
+  body.appendChild(el('div','bs','Treatment'));
+  [['🩹 Patch up',15,25],['💊 Full treatment',50,60],['💉 Surgery',120,999]].forEach(([n,c,h])=>{c=Math.ceil(c*disc);const btn=el('button','bt',n+' $'+c);btn.onclick=()=>{if(S.cash<c)return notify('Need $'+c);S.cash-=c;const a=Math.min(h,S.mhp-S.hp);S.hp=Math.min(S.mhp,S.hp+h);juice('heal',a);$('BO').classList.remove('A');upAll()};body.appendChild(btn)});
+  const hurt=S.circle.filter(c=>c.hp<c.mhp);
+  if(hurt.length){body.appendChild(el('div','bs','Crew Treatment'));hurt.forEach(c=>{const cost=Math.ceil((c.mhp-c.hp)*(home?1.2:2));const btn=el('button','bt','💊 '+c.name+' $'+cost);btn.onclick=()=>{if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;c.hp=c.mhp;notify('Healed');openBld('hospital')};body.appendChild(btn)})}
+}
+
+function bStore(body,home){
+  const disc=home?.8:1;
+  [['burger',4],['bandage',8],['medkit',28]].forEach(([id,p])=>{p=Math.ceil(p*disc);const it=ITEMS[id];const btn=el('button','bt',it.e+' '+it.n+' $'+p);btn.onclick=()=>{if(S.cash<p)return notify('Need $'+p);S.cash-=p;S.inv.push(id);notify('Bought');openBld('store')};body.appendChild(btn)});
+}
+
+function bClub(body,home){
+  const vb=el('button','bt go','🥂 VIP $'+(home?35:50)+' · +XP +respect -heat');vb.onclick=()=>{const c=home?35:50;if(S.cash<c)return notify('Need $'+c);S.cash-=c;const xp=rnd(8,18);S.xp+=xp;S.heat=Math.max(0,S.heat-3);S.respect+=2;chkLU();$('BO').classList.remove('A');upAll();showR('VIP','🥂',['+'+xp+' XP','+2 Respect','-3 Heat'],'OK','')};body.appendChild(vb);
+  const db=el('button','bt','💃 Party $20 · +15HP');db.onclick=()=>{if(S.cash<20)return notify('Need $20');S.cash-=20;S.hp=Math.min(S.mhp,S.hp+15);juice('heal',15);openBld('club')};body.appendChild(db);
+}
+
+function bCasino(body,home){
+  const betDisc=home?.85:1;
+  [['🎰 Slots',10,.42,15,40],['🃏 Blackjack',25,.48,30,80],['🎲 High Stakes',100,.43,120,350],['💎 Whale',500,.38,600,2e3]].forEach(([n,c,o,lo,hi])=>{c=Math.ceil(c*betDisc);const btn=el('button','bt',n+' $'+c);btn.onclick=()=>{if(S.cash<c)return notify('Need $'+c);S.cash-=c;if(R()<o){const w=rnd(lo,hi);S.cash+=w;S.earned+=w;S.lifetimeEarned+=w;juice('cash',w);showR('Win!','🎰',['+$'+w],'Again','openBld("casino")',w)}else showR('Bust','😤',['-$'+c],'Again','openBld("casino")')};body.appendChild(btn)});
+}
+
+function bFence(body){
+  body.appendChild(el('div','bs','Sell Hot Goods'));
+  const goods=S.inv.filter(id=>ITEMS[id]?.t==='g');
+  if(goods.length){let tv=0;goods.forEach(id=>tv+=Math.floor(ITEMS[id].v*.8));
+    const sb=el('button','bt go','💰 Sell all '+goods.length+' goods $'+tv);sb.onclick=()=>{S.cash+=tv;S.earned+=tv;S.lifetimeEarned+=tv;goods.forEach(id=>S.inv.splice(S.inv.indexOf(id),1));juice('cash',tv);log('Fenced goods. +$'+tv,'v');openBld('fence')};body.appendChild(sb);
+    goods.forEach(id=>{const it=ITEMS[id];body.appendChild(el('div','','<div style="font-size:9px;color:var(--t3);padding:1px 0">'+it.e+' '+it.n+' $'+Math.floor(it.v*.8)+'</div>'))});
+  }else body.appendChild(el('div','','<div style="font-size:10px;color:var(--t3)">No hot goods.</div>'));
+}
+
+function bShark(body){
+  if(S.loan>0){body.appendChild(el('div','cd dn','<div style="font-size:12px">💀 Owed: <b style="color:var(--rd)">$'+S.loan+'</b></div>'));
+    const pb=el('button','bt go','💰 Pay off $'+S.loan);pb.onclick=()=>{if(S.cash<S.loan)return notify('Need $'+S.loan);S.cash-=S.loan;S.loan=0;notify('Debt cleared');openBld('shark')};body.appendChild(pb);
+  }else{[100,250,500,1e3].forEach(a=>{const btn=el('button','bt','🦈 Borrow $'+a);btn.onclick=()=>{S.cash+=a;S.loan=a;juice('cash',a);log('Borrowed $'+a+'.','q');$('BO').classList.remove('A');upAll()};body.appendChild(btn)})}
+}
+
+function bGym(body,home){
+  const tc=Math.ceil((25+S.lv*3)*(home?.8:1));
+  [['🥊 ATK train $'+tc,'atk'],['🏋 DEF train $'+tc,'def'],['🏃 SPD train $'+tc,'spd']].forEach(([n,stat])=>{const btn=el('button','bt',n);btn.onclick=()=>{if(S.cash<tc)return notify('Need $'+tc);S.cash-=tc;S[stat]++;S.xp+=4;chkLU();notify('+1 '+stat.toUpperCase());$('BO').classList.remove('A');upAll()};body.appendChild(btn)});
+  const sb=el('button','bt dn','🥊 Spar · XP + respect');sb.onclick=()=>{$('BO').classList.remove('A');startCombat([mkE('bouncer')],'spar')};body.appendChild(sb);
+}
+
+function bTattoo(body){
+  [['🐍 Snake +1ATK',60,'atk',1],['🦅 Eagle +1DEF',60,'def',1],['💀 Skull +2ATK',150,'atk',2],['🔥 Sleeve +2DEF',150,'def',2],['⚡ Lightning +1SPD',80,'spd',1]].forEach(([n,c,s,v])=>{const btn=el('button','bt',n+' $'+c);btn.onclick=()=>{if(S.cash<c)return notify('Need $'+c);S.cash-=c;S[s]+=v;S.respect++;notify('+'+v+' '+s.toUpperCase());$('BO').classList.remove('A');upAll()};body.appendChild(btn)});
+}
+
+function bHotel(body,home){
+  const rc=home?20:30;
+  const rb=el('button','bt','🛏 Rest $'+rc+' · full heal -3 heat');rb.onclick=()=>{if(S.cash<rc)return notify('Need $'+rc);S.cash-=rc;S.hp=S.mhp;S.heat=Math.max(0,S.heat-3);$('BO').classList.remove('A');upAll()};body.appendChild(rb);
+  const mb=el('button','bt go','🤝 Meeting $50 · +2 respect +XP');mb.onclick=()=>{if(S.cash<50)return notify('Need $50');S.cash-=50;S.respect+=2;S.xp+=rnd(5,12);chkLU();$('BO').classList.remove('A');upAll()};body.appendChild(mb);
+}
+
+function bBookie(body){
+  [['🥊 Fight',rnd(10,50),.45],['🏇 Race',rnd(15,60),.42],['🎯 Shootout',rnd(20,80),.4]].forEach(([n,bet,odds])=>{const pay=Math.floor(bet/odds);const btn=el('button','bt',n+' · $'+bet+' → $'+pay);btn.onclick=()=>{if(S.cash<bet)return notify('Need $'+bet);S.cash-=bet;if(R()<odds){S.cash+=pay;S.earned+=pay;S.lifetimeEarned+=pay;juice('cash',pay);showR('Win!','🏆',['+$'+pay],'OK','openBld("bookie")',pay)}else showR('Lost','💸',['-$'+bet],'Again','openBld("bookie")')};body.appendChild(btn)});
+}
+
+function bGarage(body){
+  const bb=el('button','bt','🚗 Boost a car');bb.onclick=()=>{$('BO').classList.remove('A');doCrime(CRIMES.find(c=>c.id==='car'))};body.appendChild(bb);
+  const rb=el('button','bt go','🏎 Getaway car $250 · +2SPD');rb.onclick=()=>{if(S.cash<250)return notify('Need $250');S.cash-=250;S.spd+=2;notify('+2 SPD');$('BO').classList.remove('A');upAll()};body.appendChild(rb);
+}
+
+function bWarehouse(body){
+  body.appendChild(el('div','','<div style="font-size:10px;color:var(--t2)">Inventory: '+S.inv.length+' items stashed.</div>'));
+  const rb=el('button','bt dn','📦 Raid a rival stash');rb.onclick=()=>{$('BO').classList.remove('A');const cr=CRIMES.find(c=>c.id==='raid'||c.id==='smug');if(cr)doCrime(cr)};body.appendChild(rb);
+}
+
+function bRecruiter(body){
+  body.appendChild(el('div','bs','Soldiers'));
+  body.appendChild(el('div','','<div style="font-size:10px;color:var(--t2)">Current: <b>'+S.soldiers+'</b>/'+maxSoldiers()+' · $10/ea/week</div>'));
+  if(S.soldiers<maxSoldiers()){
+    [1,5,10].forEach(n=>{if(S.soldiers+n>maxSoldiers())return;const c=20*n;const btn=el('button','bt','🔫 Recruit '+n+' · $'+c);btn.onclick=()=>{if(S.cash<c)return notify('Need $'+c);S.cash-=c;S.soldiers+=n;log('Recruited '+n+' soldiers.','v');openBld('recruiter')};body.appendChild(btn)});
+  }else body.appendChild(el('div','','<div style="font-size:10px;color:var(--gn)">Army at capacity.</div>'));
+}
+
+function bChopshop(body){
+  const parts=S.inv.filter(id=>id==='car_parts');
+  if(parts.length){const pv=parts.length*60;const sb=el('button','bt go','🔧 Sell '+parts.length+' parts $'+pv);sb.onclick=()=>{S.cash+=pv;S.earned+=pv;S.lifetimeEarned+=pv;S.inv=S.inv.filter(id=>id!=='car_parts');juice('cash',pv);log('Sold parts. +$'+pv,'v');openBld('chopshop')};body.appendChild(sb)}
+  const bb=el('button','bt','🚗 Boost a car');bb.onclick=()=>{$('BO').classList.remove('A');doCrime(CRIMES.find(c=>c.id==='car'))};body.appendChild(bb);
+}
+
+function bDruglab(body,home){
+  const cc=Math.max(10,Math.ceil(30*(home?.7:1)));
+  const btn=el('button','bt go','🧪 Cook batch $'+cc+' → 2 packages');btn.onclick=()=>{if(S.cash<cc)return notify('Need $'+cc);S.cash-=cc;S.inv.push('drugs');S.inv.push('drugs');S.heat=Math.min(100,S.heat+2);S.xp+=4;chkLU();openBld('druglab')};body.appendChild(btn);
+  const pkgs=S.inv.filter(id=>id==='drugs');
+  if(pkgs.length){const sv=pkgs.length*(50+(hasAb('purity')?40:0));const sb=el('button','bt go','💊 Sell '+pkgs.length+' packages $'+sv);sb.onclick=()=>{S.cash+=sv;S.earned+=sv;S.lifetimeEarned+=sv;S.heat=Math.min(100,S.heat+pkgs.length);S.inv=S.inv.filter(id=>id!=='drugs');juice('cash',sv);log('Sold product. +$'+sv,'v');openBld('druglab')};body.appendChild(sb)}
+  else body.appendChild(el('div','','<div style="font-size:10px;color:var(--t3)">No product. Cook some first.</div>'));
+}
+
+function bSafehouse(body){
+  const hRed=5+S.safeLv*2;
+  const rb=el('button','bt go','😴 Sleep · full heal -'+hRed+' heat');rb.onclick=()=>{S.hp=S.mhp;S.day++;S.workedDay=0;S.heat=Math.max(0,S.heat-hRed);S.combo=0;S.circle.forEach(c=>c.hp=Math.min(c.mhp,c.hp+Math.floor(c.mhp*.25)));dayTick();$('BO').classList.remove('A');upAll();showR('Rested','😴',['Fully healed','Circle partially healed','-'+hRed+' Heat'],'OK','')};body.appendChild(rb);
+  const uc=(S.safeLv+1)*300;
+  body.appendChild(el('div','','<div style="font-size:10px;color:var(--t3);margin:4px 0">Safehouse Lv'+S.safeLv+' · -'+hRed+' heat/rest</div>'));
+  const ub=el('button','bt','⬆ Upgrade $'+uc);ub.onclick=()=>{if(S.cash<uc)return notify('Need $'+uc);S.cash-=uc;S.safeLv++;log('Safehouse → Lv'+S.safeLv,'v');openBld('safehouse_bld')};body.appendChild(ub);
+}
+
+// ======================================================
+// MAP TAB — Block-by-block territory
+// ======================================================
+function upMap(){
+  const tab=$('map-tab');tab.innerHTML='';
+  if(!S.city)return;
+
+  const owned=S.city.blocks.filter(b=>b.owned);
+  const rival=S.city.blocks.filter(b=>!b.owned&&b.familyIdx!==undefined);
+  const free=S.city.blocks.filter(b=>!b.owned&&b.familyIdx===undefined);
+
+  tab.appendChild(el('div','sh','Your Blocks ('+owned.length+')'));
+  if(owned.length){
+    owned.forEach(b=>{
+      const op=b.op?OPS.find(x=>x.id===b.op):null;
+      const bc=el('div','blk owned');
+      bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${b.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--t3)">${b.typeData?.n||b.type}${op?' · '+op.e+' '+op.n+' Lv'+(b.opLv||1):' · No operation'}</div><div style="font-size:10px;color:var(--gn)">+$${b.income+(op?op.inc*(b.opLv||1):0)}/wk</div></div></div>`;
+      bc.onclick=()=>openBlock(b);
+      tab.appendChild(bc);
+    });
+  } else tab.appendChild(el('div','cd','<div style="font-size:10px;color:var(--t3)">No blocks owned. Take some from the map below.</div>'));
+
+  tab.appendChild(el('div','sh','Unclaimed ('+free.length+')'));
+  free.forEach(b=>{
+    const bc=el('div','blk free');
+    bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${b.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--t3)">${b.typeData?.n||b.type} · ${b.owner?b.owner.name+' ('+b.owner.trait+')':'Unclaimed'}</div><div style="font-size:10px;color:var(--t2)">Base income: $${b.income}/wk</div></div></div>`;
+    bc.onclick=()=>openTakeBlock(b);
+    tab.appendChild(bc);
+  });
+
+  if(rival.length){
+    tab.appendChild(el('div','sh','Rival Territory ('+rival.length+')'));
+    rival.forEach(b=>{
+      const fam=S.city.families[b.familyIdx];
+      const bc=el('div','blk rival');
+      bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${b.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--rd)">${fam?.name||'Rival'} · ${b.owner?.name||'Unknown'}</div><div style="font-size:10px;color:var(--t2)">$${b.income}/wk · Str ${b.owner?.str||'?'}</div></div></div>`;
+      bc.onclick=()=>openTakeBlock(b);
+      tab.appendChild(bc);
+    });
+  }
+}
+
+function openBlock(b){
+  // Manage owned block
+  const op=b.op?OPS.find(x=>x.id===b.op):null;
+  let h=`<div style="text-align:center"><div style="font-size:36px">${b.typeData?.e||'📍'}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin:4px 0">${b.name}</div><div style="font-size:11px;color:var(--t2);margin-bottom:8px">${b.typeData?.n||b.type} · +$${b.income+(op?op.inc*(b.opLv||1):0)}/wk</div></div>`;
+  if(op){
+    h+=`<div style="font-size:11px;color:var(--gn);margin-bottom:6px">${op.e} ${op.n} Lv${b.opLv||1} · +$${op.inc*(b.opLv||1)}/wk · +${op.heat} heat/wk</div>`;
+    const upgCost=(b.opLv||1)*op.cost;
+    h+=`<button class="bt go" style="text-align:center" onclick="upgradeOp(${b.id})">⬆ Upgrade $${upgCost}</button>`;
+    h+=`<button class="bt" style="text-align:center" onclick="removeOp(${b.id})">🗑 Remove operation</button>`;
+  } else {
+    h+=`<div style="font-size:11px;color:var(--t3);margin-bottom:8px">No operation running. Set one up:</div>`;
+    OPS.forEach(op2=>{
+      h+=`<button class="bt" style="text-align:center" onclick="setOp(${b.id},'${op2.id}')">${op2.e} ${op2.n} · $${op2.cost} · +$${op2.inc}/wk${op2.heat?' · +'+op2.heat+'🔥/wk':''}</button>`;
+    });
+  }
+  h+=`<button class="bt dn" style="text-align:center;margin-top:6px" onclick="abandonBlock(${b.id})">🚫 Abandon block</button>`;
+  h+=`<button class="bt" style="text-align:center" onclick="closeD()">← Back</button>`;
+  openD(h);
+}
+
+function setOp(blockId,opId){
+  const b=S.city.blocks.find(x=>x.id===blockId);const op=OPS.find(x=>x.id===opId);
+  if(!b||!op)return;if(S.cash<op.cost)return notify('Need $'+op.cost);
+  S.cash-=op.cost;b.op=opId;b.opLv=1;
+  log('Set up '+op.n+' on '+b.name+'.','v');closeD();upAll();
+}
+function upgradeOp(blockId){
+  const b=S.city.blocks.find(x=>x.id===blockId);if(!b||!b.op)return;
+  const op=OPS.find(x=>x.id===b.op);const cost=(b.opLv||1)*op.cost;
+  if(S.cash<cost)return notify('Need $'+cost);
+  S.cash-=cost;b.opLv=(b.opLv||1)+1;
+  log('Upgraded '+op.n+' on '+b.name+' to Lv'+b.opLv+'.','v');closeD();upAll();
+}
+function removeOp(blockId){const b=S.city.blocks.find(x=>x.id===blockId);if(b)b.op=null;closeD();upAll()}
+function abandonBlock(blockId){const b=S.city.blocks.find(x=>x.id===blockId);if(b){b.owned=false;b.op=null}closeD();upAll()}
+
+function openTakeBlock(b){
+  let h=`<div style="text-align:center"><div style="font-size:36px">${b.typeData?.e||'📍'}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin:4px 0">${b.name}</div><div style="font-size:11px;color:var(--t2);margin-bottom:4px">${b.typeData?.n||b.type} · $${b.income}/wk potential</div></div>`;
+
+  if(b.owner){
+    h+=`<div style="font-size:11px;color:var(--t2);margin-bottom:8px">Controlled by <b>${b.owner.name}</b> (${b.owner.trait})${b.familyIdx!==undefined?' · '+S.city.families[b.familyIdx].name:''}</div>`;
+
+    // Options depend on owner trait
+    const fightCost=0;
+    h+=`<button class="bt dn" style="text-align:center" onclick="takeBlockFight(${b.id})">⚔ Take by force (+heat)</button>`;
+
+    if(b.owner.willSell){
+      h+=`<button class="bt go" style="text-align:center" onclick="takeBlockBuy(${b.id})">💰 Buy out $${b.owner.sellPrice}</button>`;
+    }
+
+    if(b.owner.trait==='cowardly'||b.owner.trait==='corrupt'){
+      const intCost=Math.floor((b.owner.sellPrice||100)*.4);
+      h+=`<button class="bt" style="text-align:center" onclick="takeBlockIntimidate(${b.id})">😤 Intimidate $${intCost} (+respect)</button>`;
+    }
+  } else {
+    h+=`<div style="font-size:11px;color:var(--t3);margin-bottom:8px">Unclaimed territory.</div>`;
+    h+=`<button class="bt go" style="text-align:center" onclick="takeBlockClaim(${b.id})">🏴 Claim it (free, needs soldiers)</button>`;
+  }
+  h+=`<button class="bt" style="text-align:center" onclick="closeD()">← Back</button>`;
+  openD(h);
+}
+
+function takeBlockFight(blockId){
+  closeD();
+  const b=S.city.blocks.find(x=>x.id===blockId);if(!b)return;
+  const enemies=[mkE(b.familyIdx!==undefined?'rival':'enforcer')];
+  if(b.owner?.str>30)enemies.push(mkE('gang'));
+  S.heat=Math.min(100,S.heat+3);
+  combat={enemies,round:0,log:[],done:false,ctx:'block_'+blockId};
+  renderC();$('CO').style.display='flex';
+}
+
+function takeBlockBuy(blockId){
+  const b=S.city.blocks.find(x=>x.id===blockId);if(!b||!b.owner)return;
+  if(S.cash<b.owner.sellPrice)return notify('Need $'+b.owner.sellPrice);
+  S.cash-=b.owner.sellPrice;b.owned=true;b.owner=null;
+  if(b.familyIdx!==undefined){const fam=S.city.families[b.familyIdx];fam.blocks=fam.blocks.filter(id=>id!==b.id);b.familyIdx=undefined}
+  log('Bought '+b.name+'.','v');closeD();upAll();showR('Block Acquired!','🏴',[b.name+' is yours.','Set up an operation for income.'],'OK','');
+}
+
+function takeBlockIntimidate(blockId){
+  const b=S.city.blocks.find(x=>x.id===blockId);if(!b||!b.owner)return;
+  const cost=Math.floor((b.owner.sellPrice||100)*.4);
+  if(S.cash<cost)return notify('Need $'+cost);
+  // Success depends on respect + trait
+  const chance=b.owner.trait==='cowardly'?85:b.owner.trait==='corrupt'?70:50;
+  if(R()*100<chance+S.respect){
+    S.cash-=cost;b.owned=true;
+    if(b.familyIdx!==undefined){S.city.families[b.familyIdx].blocks=S.city.families[b.familyIdx].blocks.filter(id=>id!==b.id);b.familyIdx=undefined}
+    b.owner=null;S.respect+=2;S.heat=Math.min(100,S.heat+2);
+    log('Intimidated owner of '+b.name+'. +2 respect.','v');closeD();upAll();showR('Intimidated!','😤',[b.name+' is yours.','+2 Respect'],'OK','');
+  } else {
+    S.cash-=cost;S.heat=Math.min(100,S.heat+3);
+    log('Intimidation failed at '+b.name+'. Owner called cops.','c');closeD();upAll();showR('Failed!','😤',['Owner resisted.','+3 Heat'],'OK','');
+  }
+}
+
+function takeBlockClaim(blockId){
+  const b=S.city.blocks.find(x=>x.id===blockId);if(!b)return;
+  if(S.soldiers<1)return notify('Need soldiers to claim');
+  S.soldiers--;b.owned=true;b.owner=null;
+  log('Claimed '+b.name+'.','v');closeD();upAll();showR('Claimed!','🏴',[b.name+' is yours.'],'OK','');
+}
+
+// ======================================================
+// JOBS TAB
+// ======================================================
+function upJobs(){
+  const tab=$('jobs-tab');tab.innerHTML='';
+  if(S.combo>0){const cc=el('div','cd gl');cc.style.textAlign='center';cc.innerHTML=`<div style="font-size:10px;color:var(--gd);font-weight:700;letter-spacing:1px">🔥 STREAK</div><div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gd)">${S.combo}×</div><div style="font-size:9px;color:var(--t2)">+${Math.round((comboM()-1)*100)}% · fail = reset</div>`;tab.appendChild(cc)}
+  const mt=Math.floor(S.lv/3);
+  CRIMES.forEach(cr=>{
+    if(cr.tier>mt)return;
+    const onCD=S.crimeCD[cr.id]>S.day;
+    const odds=clamp(cr.base+Math.floor(S.lv*1.2)+crimeBon()-cr.tier*5-Math.floor(S.heat/10),10,95);
+    const cLo=Math.floor((cr.cash[0]+S.lv*cr.tier*2)*comboM()*prestigeM());
+    const cHi=Math.floor((cr.cash[1]+S.lv*cr.tier*2)*comboM()*prestigeM());
+    const hg=Math.max(1,cr.ht-heatRedux());
+    const isHot=S.hotTip?.crime===cr.id&&S.hotTip.exp>S.day;const hm=isHot?S.hotTip.mult:1;
+    const card=el('div','cd'+(isHot?' dn':''));
+    card.innerHTML=`${isHot?'<div style="position:absolute;top:0;right:0;padding:1px 5px;background:var(--rd);color:#fff;font-size:7px;font-weight:700;border-radius:0 0 0 5px">'+hm+'×</div>':''}<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="font-size:26px">${cr.e}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${cr.n}</div></div><div style="text-align:center"><div class="co ${odds>=70?'h':odds>=50?'m':'l'}" style="font-size:16px">${odds}%</div></div></div><div style="display:flex;gap:3px;font-size:9px;margin-bottom:5px"><div style="flex:1;background:var(--bg);padding:2px;border-radius:3px;text-align:center;color:var(--gd)">$${fmt(cLo*hm)}-${fmt(cHi*hm)}</div><div style="flex:1;background:var(--bg);padding:2px;border-radius:3px;text-align:center;color:var(--cy)">+${cr.xp}XP</div><div style="flex:1;background:var(--bg);padding:2px;border-radius:3px;text-align:center;color:var(--ht)">+${hg}🔥</div></div>`;
+    if(onCD){card.appendChild(el('button','bt','⏳ '+(S.crimeCD[cr.id]-S.day)+'d'));card.lastChild.disabled=true}
+    else{const gb=el('button','bt go',cr.multi?'🎯 Plan':'Do it');gb.onclick=()=>cr.multi?doHeist(cr):doCrime(cr);card.appendChild(gb)}
+    tab.appendChild(card);
+  });
+  CRIMES.forEach(cr=>{if(cr.tier<=mt)return;const c=el('div','cd');c.style.opacity='.2';c.innerHTML=`<div style="display:flex;gap:8px;align-items:center"><div style="font-size:20px">🔒</div><div style="font-weight:600;font-size:11px">${cr.n} — Lv${cr.tier*3}</div></div>`;tab.appendChild(c)});
+}
+
+function doCrime(cr){
+  const odds=clamp(cr.base+Math.floor(S.lv*1.2)+crimeBon()-cr.tier*5-Math.floor(S.heat/10),10,95);
+  const isHot=S.hotTip?.crime===cr.id&&S.hotTip.exp>S.day;const hm=isHot?S.hotTip.mult:1;
+  const hg=Math.max(1,cr.ht-heatRedux());
+  if(cr.cd)S.crimeCD[cr.id]=S.day+cr.cd;S.crimes++;
+  if(R()*100<odds){
+    S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);
+    const raw=rnd(cr.cash[0]+S.lv*cr.tier*2,cr.cash[1]+S.lv*cr.tier*2);
+    const earned=Math.floor(raw*comboM()*hm*prestigeM());
+    S.cash+=earned;S.xp+=cr.xp;S.heat=Math.min(100,S.heat+hg);S.earned+=earned;S.lifetimeEarned+=earned;S.respect++;
+    let jack=R()<.08;if(jack){S.cash+=earned;S.earned+=earned;S.lifetimeEarned+=earned}
+    log('✅ '+cr.n+': +$'+earned+(jack?' JACKPOT!':'')+' ×'+S.combo,'v');
+    juice('cash',earned);if(isHot)S.hotTip=null;chkLU();dayTick();upAll();
+    const lines=['💰 +$'+fmt(earned)+(S.combo>1?' (×'+S.combo+')':''),'+'+cr.xp+' XP','+'+hg+' Heat'];
+    if(jack)lines.push('🎰 JACKPOT +$'+fmt(earned));
+    showR(jack?'JACKPOT!':'Success!',jack?'🎰':cr.e,lines,'OK','',earned);
+    // Ad
+    setTimeout(()=>{const rp=$('RP');if(!rp?.classList.contains('show')||rp.querySelector('.bt.ad'))return;const ab=el('button','bt ad','📺 Double +$'+fmt(earned));ab.style.marginTop='2px';ab.onclick=()=>{S.cash+=earned;S.earned+=earned;S.lifetimeEarned+=earned;closeR();juice('cash',earned);upAll()};rp.querySelector('.bt.go')?.after(ab)},80);
+  } else {
+    const dmg=rnd(cr.fd[0],cr.fd[1]),lost=rnd(cr.fl[0],cr.fl[1]);
+    S.hp=Math.max(1,S.hp-dmg);S.cash=Math.max(0,S.cash-lost);S.heat=Math.min(100,S.heat+hg+2);const oc=S.combo;S.combo=0;
+    if(cr.tier>=2&&S.soldiers>0&&R()<.15){S.soldiers--;log('💀 Lost a soldier.','c')}
+    log('❌ '+cr.n+' failed.'+(oc>1?' ×'+oc+' broken!':''),'c');if(dmg>0)juice('dmg',dmg);dayTick();upAll();
+    showR('Failed!','💥',[dmg?'-'+dmg+' HP':'',lost?'-$'+lost:'','+'+(hg+2)+' Heat',oc>1?'×'+oc+' broken':''].filter(Boolean),'OK','');
+  }
+  if(S.heat>=70&&R()<.2)setTimeout(()=>{startCombat([mkE(S.heat>=90?'swat':'cop'),mkE('cop')],'police')},1e3);
+}
+
+function doHeist(cr){
+  const steps=[{q:"Entry?",o:[["Front (fast)",{od:-8,ht:3}],["Side",{}],["Roof (quiet)",{od:5,ht:-3}]]},{q:"Guards?",o:[["Neutralize",{od:5,ht:4,dm:5}],["Sneak",{od:-5,ht:-2}],["Bribe $50",{od:10,co:50}]]},{q:"Grab?",o:[["Everything",{ca:1.5,ht:4,od:-10}],["Smart",{ca:1}],["Quick",{ca:.7,ht:-3,od:5}]]}];
+  let cum={od:0,ht:0,ca:1,dm:0,co:0},step=0;
+  function show(){const s=steps[step];let h=`<div style="text-align:center"><div style="font-size:40px">🏦</div><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gd);letter-spacing:2px;margin:6px 0">STEP ${step+1}/${steps.length}</div><div style="margin-bottom:10px">${s.q}</div>`;s.o.forEach(([n,m],i)=>h+=`<button class="bt${i===1?' go':''}" style="text-align:center" onclick="hC(${step},${i})">${n}</button>`);h+=`<button class="bt dn" style="text-align:center;margin-top:4px" onclick="closeD()">Abort</button></div>`;openD(h)}
+  window.hC=(si,ci)=>{const[,m]=steps[si].o[ci];cum.od+=(m.od||0);cum.ht+=(m.ht||0);cum.ca*=(m.ca||1);cum.dm+=(m.dm||0);cum.co+=(m.co||0);step++;if(step<steps.length)return show();closeD();
+    if(cum.co>0&&S.cash<cum.co)return notify('Need $'+cum.co);S.cash-=(cum.co||0);
+    const odds=clamp(cr.base+Math.floor(S.lv*1.2)+crimeBon()-cr.tier*5-Math.floor(S.heat/10)+cum.od,10,95);
+    const hg=Math.max(1,cr.ht-heatRedux()+cum.ht);if(cr.cd)S.crimeCD[cr.id]=S.day+cr.cd;S.crimes++;
+    if(R()*100<odds){S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);
+      const e2=Math.floor((rnd(cr.cash[0],cr.cash[1])+S.lv*cr.tier*3)*comboM()*cum.ca*prestigeM());
+      S.cash+=e2;S.xp+=cr.xp;S.heat=Math.min(100,S.heat+hg);S.earned+=e2;S.lifetimeEarned+=e2;S.respect+=3;if(cum.dm>0)S.hp=Math.max(1,S.hp-cum.dm);
+      log('🏦 HEIST! +$'+e2,'v');juice('cash',e2);chkLU();dayTick();upAll();showR('HEIST!','🏦',['+$'+fmt(e2),'+'+cr.xp+' XP','+3 Respect'],'OK','',e2)
+    }else{const d=rnd(cr.fd[0],cr.fd[1])+cum.dm,l=rnd(cr.fl[0],cr.fl[1]);S.hp=Math.max(1,S.hp-d);S.cash=Math.max(0,S.cash-l);S.heat=Math.min(100,S.heat+hg+3);S.combo=0;
+      if(S.soldiers>0&&R()<.25){const dead=rnd(1,2);S.soldiers=Math.max(0,S.soldiers-dead)}
+      log('🏦 FAILED!','c');juice('dmg',d);dayTick();upAll();showR('Failed!','💥',['-'+d+' HP','-$'+l,'+'+(hg+3)+' Heat'],'OK','')}
+  };show();
+}
+
+// ======================================================
+// CREW TAB
+// ======================================================
+function upCrew(){
+  const tab=$('crew-tab');tab.innerHTML='';
+  tab.appendChild(el('div','sh','Inner Circle ('+S.circle.length+'/3)'));
+  if(!S.circle.length)tab.appendChild(el('div','cd','<div style="font-size:10px;color:var(--t2)">No lieutenants. Find a bar to recruit.</div>'));
+  else S.circle.forEach((c,i)=>{
+    const lc=c.loy>=60?'var(--gn)':c.loy>=30?'var(--gd)':'var(--rd)';
+    const rc=el('div','cd');
+    rc.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="font-size:24px">${c.e}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${c.name}</div><div style="font-size:9px;color:var(--t3)">${c.role} Lv${c.lv||1} · <span style="color:${lc}">Loy ${c.loy}</span> · $${c.wage}/wk</div><div style="font-size:9px;color:var(--pp)">${c.abD}</div></div></div><div style="display:flex;gap:3px;font-size:8px;margin-bottom:3px"><span style="background:var(--bg);padding:2px 5px;border-radius:3px">⚔${c.a}</span><span style="background:var(--bg);padding:2px 5px;border-radius:3px">🛡${c.d}</span><span style="background:var(--bg);padding:2px 5px;border-radius:3px">❤${c.hp}/${c.mhp}</span></div><div class="bar"><div class="bf" style="width:${pct(c.hp,c.mhp)}%;background:${c.hp>c.mhp*.5?'var(--gn)':'var(--rd)'}"></div></div>`;
+    const acts=el('div','');acts.style.cssText='display:flex;gap:2px;margin-top:4px;flex-wrap:wrap';
+    if(c.hp<c.mhp){const hb=el('button','bt sm','💊$30');hb.onclick=()=>{if(S.cash<30)return notify('Need $30');S.cash-=30;c.hp=c.mhp;upCrew()};acts.appendChild(hb)}
+    const uc=((c.lv||1))*100;const ub=el('button','bt sm go','⬆$'+uc);ub.onclick=()=>{if(S.cash<uc)return notify('Need $'+uc);S.cash-=uc;c.lv=(c.lv||1)+1;c.a+=2;c.d++;c.mhp+=8;c.hp=c.mhp;c.loy=Math.min(100,c.loy+10);log(c.name+' → Lv'+c.lv,'v');upCrew()};acts.appendChild(ub);
+    const pb=el('button','bt sm','💰Loy');pb.onclick=()=>{if(S.cash<25)return notify('Need $25');S.cash-=25;c.loy=Math.min(100,c.loy+rnd(8,15));upCrew()};acts.appendChild(pb);
+    const fb=el('button','bt sm dn','✕');fb.onclick=()=>{S.circle.splice(i,1);upCrew()};acts.appendChild(fb);
+    rc.appendChild(acts);tab.appendChild(rc);
+  });
+  if(S.circle.length<3){
+    tab.appendChild(el('div','sh','Recruit'));
+    const lt=rA(LT_TYPES);const recruit={name:mkN(),role:lt.role,e:lt.e,ab:lt.ab,abD:lt.abD,a:lt.bA+rnd(0,Math.floor(S.lv/4)),d:lt.bD+rnd(0,Math.floor(S.lv/5)),hp:lt.bHP,mhp:lt.bHP,wage:lt.wage+Math.floor(S.lv/3)*5,loy:rnd(40,70),lv:1};
+    const cost=recruit.wage*6;
+    const rc2=el('div','cd');rc2.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:22px">${recruit.e}</div><div style="flex:1"><div style="font-weight:700;font-size:11px">${recruit.name}</div><div style="font-size:9px;color:var(--t3)">${recruit.role} · ⚔${recruit.a} 🛡${recruit.d} · $${recruit.wage}/wk</div><div style="font-size:9px;color:var(--pp)">${recruit.abD}</div></div></div>`;
+    const hb=el('button','bt go','Hire $'+cost);hb.onclick=()=>{if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;S.circle.push(recruit);log('Hired '+recruit.name+'.','v');notify('Hired!');upCrew()};
+    rc2.appendChild(hb);tab.appendChild(rc2);
+    tab.appendChild(el('button','bt','🔄 Reroll'));tab.lastChild.onclick=()=>upCrew();
+  }
+  // Soldiers
+  tab.appendChild(el('div','sh','Soldiers'));
+  tab.appendChild(el('div','cd',`<div style="font-weight:700;font-size:14px">🔫 ${S.soldiers}/${maxSoldiers()}</div><div style="font-size:9px;color:var(--t3)">$10/ea/week · Needed for territory</div><div class="bar" style="margin-top:3px"><div class="bf" style="width:${pct(S.soldiers,maxSoldiers())}%;background:var(--bl)"></div></div>`));
+  // Upkeep
+  tab.appendChild(el('div','cd','<div style="font-size:10px;text-align:center">Income <span style="color:var(--gn)">+$'+blockIncome()+'</span> · Upkeep <span style="color:var(--rd)">-$'+weeklyUp()+'</span> · Net <b style="color:'+(blockIncome()>=weeklyUp()?'var(--gn)':'var(--rd)')+'">$'+(blockIncome()-weeklyUp())+'</b>/wk</div>'));
+}
+
+// ======================================================
+// PROFILE
+// ======================================================
+function upYou(){
+  const tab=$('you-tab');tab.innerHTML='';const r=getRank();const w=S.gear.w?ITEMS[S.gear.w]:null;const a=S.gear.a?ITEMS[S.gear.a]:null;
+  tab.innerHTML=`<div class="cd gl" style="text-align:center"><div style="font-size:40px">${r.e}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px">${S.name}</div><div><span class="tag tg">${r.n}</span>${S.prestige?'<span class="tag tg" style="margin-left:3px">♻️×'+S.prestige+'</span>':''}</div><div style="font-size:10px;color:var(--t3);margin-top:4px">Lv${S.lv} · ${S.city?.name||''} · Day ${S.day}</div></div>
+  <div class="cd"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center;font-size:9px"><div style="background:var(--bg);padding:5px;border-radius:4px"><div style="color:var(--t3)">ATK</div><div style="font-size:16px;font-weight:700">${atkT()}</div></div><div style="background:var(--bg);padding:5px;border-radius:4px"><div style="color:var(--t3)">DEF</div><div style="font-size:16px;font-weight:700">${defT()}</div></div><div style="background:var(--bg);padding:5px;border-radius:4px"><div style="color:var(--t3)">SPD</div><div style="font-size:16px;font-weight:700">${S.spd}</div></div></div>${S.sp>0?'<button class="bt go" style="margin-top:4px;text-align:center" onclick="openLU()">★ '+S.sp+'PTS</button>':''}</div>
+  <div class="sh">Gear</div><div class="cd"><div style="display:flex;align-items:center;gap:7px;padding:3px 0;border-bottom:1px solid var(--bd)"><div style="font-size:18px">${w?w.e:'🤜'}</div><div style="flex:1;font-size:11px;font-weight:600">${w?w.n:'Fists'}${w?' +'+w.a+'ATK':''}</div>${w?'<button class="bt sm" onclick="ueq(\'w\')">✕</button>':''}</div><div style="display:flex;align-items:center;gap:7px;padding:3px 0"><div style="font-size:18px">${a?a.e:'👕'}</div><div style="flex:1;font-size:11px;font-weight:600">${a?a.n:'Clothes'}${a?' +'+a.d+'DEF':''}</div>${a?'<button class="bt sm" onclick="ueq(\'a\')">✕</button>':''}</div></div>
+  <div class="sh">Inventory (${S.inv.length})</div><div class="cd">${S.inv.length?S.inv.map((id,i)=>{const it=ITEMS[id];if(!it)return'';return`<div class="si"><div style="font-size:14px">${it.e}</div><div style="flex:1;font-size:10px;font-weight:600">${it.n} ${it.t==='w'?'+'+it.a+'ATK':it.t==='a'?'+'+it.d+'DEF':it.t==='c'?'+'+it.heal+'HP':'$'+it.v}</div>${it.t==='w'||it.t==='a'?'<button class="bt sm go" onclick="eq('+i+')">⬆</button>':''}${it.t==='c'?'<button class="bt sm" onclick="use('+i+')">Use</button>':''}</div>`}).join(''):'<div style="font-size:9px;color:var(--t3)">Empty.</div>'}</div>
+  <div class="sh">Stats</div><div class="cd" style="font-size:10px;display:grid;grid-template-columns:1fr 1fr;gap:2px"><div>🔫 Crimes: ${S.crimes}</div><div>💀 Kills: ${S.kills}</div><div>💰 Earned: $${fmt(S.lifetimeEarned)}</div><div>🔥 Streak: ${S.maxCombo}×</div><div>🏴 Blocks: ${ownedBlocks()}</div><div>🚔 Jailed: ${S.jails}</div></div>
+  ${S.lv>=15?'<div class="sh">Prestige</div><div class="cd" style="text-align:center"><div style="font-size:28px">♻️</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gd);margin:3px 0">NEW CITY</div><div style="font-size:10px;color:var(--t2);margin-bottom:6px">Reset. Keep +'+((S.prestige+1)*10)+'% cash forever.</div><button class="bt dn" style="text-align:center" onclick="doPrestige()">🔄 Prestige</button></div>':''}
+  <div class="cd" style="display:flex;gap:3px"><button class="bt" style="flex:1;text-align:center" onclick="save();notify('Saved')">💾</button><button class="bt dn" style="flex:1;text-align:center" onclick="confirmNew()">⚠ NEW</button></div>`;
+}
+function eq(i){const id=S.inv[i],it=ITEMS[id];if(!it)return;const s=it.t==='w'?'w':it.t==='a'?'a':null;if(!s)return;if(S.gear[s])S.inv.push(S.gear[s]);S.gear[s]=id;S.inv.splice(i,1);upAll()}
+function ueq(s){if(!S.gear[s])return;S.inv.push(S.gear[s]);S.gear[s]=null;upAll()}
+function use(i){const id=S.inv[i],it=ITEMS[id];if(!it?.heal)return;S.hp=Math.min(S.mhp,S.hp+it.heal);S.inv.splice(i,1);juice('heal',it.heal);upAll()}
+function doPrestige(){const p=S.prestige+1,lt=S.lifetimeEarned,mc=S.maxCombo,nm=S.name;S=clone(BASE);S.name=nm;S.prestige=p;S.lifetimeEarned=lt;S.maxCombo=mc;S.city=genCity();log('♻️ Prestige '+p+'! Welcome to '+S.city.name+'.','q');upAll();sw('hub');showR('PRESTIGE '+p,'♻️',['New city: '+S.city.name,'+'+p*10+'% cash forever'],'OK','')}
+
+// ======================================================
+// LOG
+// ======================================================
+function upLog(){const tab=$('log-tab');tab.innerHTML='';tab.appendChild(el('div','sh','Log'));if(!S.log.length)return;S.log.forEach((g,gi)=>{const d=el('div','log-d');const h=el('div','log-h','<span>Day '+g.day+'</span><span style="color:var(--t3);font-size:8px">'+g.e.length+'</span>');const b=el('div','log-b'+(gi===0?' open':''));g.e.forEach(e=>b.appendChild(el('div','log-e '+(e.type==='c'?'lc':e.type==='v'?'lv':e.type==='q'?'lq':'li'),e.t)));h.onclick=()=>b.classList.toggle('open');d.appendChild(h);d.appendChild(b);tab.appendChild(d)})}
+
+// ======================================================
+// COMBAT
+// ======================================================
+function startCombat(enemies,ctx){combat={enemies,round:0,log:[],done:false,ctx:ctx||''};renderC();$('CO').style.display='flex'}
+function renderC(){
+  const ea=$('EA'),aa=$('AA'),cl=$('CL'),ca=$('CA');ea.innerHTML='';aa.innerHTML='';cl.innerHTML=combat.log.slice(-8).join('<br>');ca.innerHTML='';
+  combat.enemies.forEach(e=>ea.appendChild(Object.assign(el('div','cu'+(e.hp<=0?' dead':'')),{innerHTML:`<div class="ue">${e.e}</div><div class="un">${e.name}</div><div class="uh">❤${Math.max(0,e.hp)}</div>`})));
+  aa.appendChild(Object.assign(el('div','cu'),{innerHTML:`<div class="ue">🤵</div><div class="un">YOU</div><div class="uh">❤${S.hp}</div>`}));
+  S.circle.forEach(c=>{if(c.hp>0)aa.appendChild(Object.assign(el('div','cu'),{innerHTML:`<div class="ue">${c.e}</div><div class="un">${c.name.split(' ')[0]}</div><div class="uh">❤${c.hp}</div>`}))});
+  if(combat.done)return;
+  const ab=el('button','bt go','⚔ ATK');ab.style.flex='1';ab.style.textAlign='center';ab.onclick=()=>cRound('atk');ca.appendChild(ab);
+  const fb=el('button','bt dn','🏃');fb.style.flex='1';fb.style.textAlign='center';fb.onclick=()=>{if(R()*100<30+escapeBonus()){combat.done=true;$('CO').style.display='none';upAll()}else{combat.log.push("Can't flee!");cRound('flee')}};ca.appendChild(fb);
+  const hi=S.inv.filter(id=>ITEMS[id]?.heal);if(hi.length){const hb=el('button','bt','💊');hb.style.width='40px';hb.style.textAlign='center';hb.onclick=()=>{const id=hi[0],it=ITEMS[id];S.hp=Math.min(S.mhp,S.hp+it.heal);S.inv.splice(S.inv.indexOf(id),1);combat.log.push('+'+it.heal+'HP');cRound('heal')};ca.appendChild(hb)}
+  cl.scrollTop=cl.scrollHeight;
+}
+function cRound(action){
+  if(combat.done)return;combat.round++;
+  if(action==='atk'){const ae=combat.enemies.filter(e=>e.hp>0);if(ae.length){const t=ae[0];const d=Math.max(1,atkT()-Math.floor(t.d/2)+rnd(-2,3));t.hp-=d;combat.log.push('You→'+t.name+' -'+d);if(t.hp>0&&t.hp<=t.mhp*.2&&hasAb('execute')){t.hp=0;combat.log.push('🎯 EXECUTED!')}if(t.hp<=0){combat.log.push(t.name+' DOWN');S.kills++}}}
+  S.circle.forEach(c=>{if(c.hp<=0)return;const ae=combat.enemies.filter(e=>e.hp>0);if(!ae.length)return;const t=rA(ae);const d=Math.max(1,c.a-Math.floor(t.d/2)+rnd(-1,2));t.hp-=d;combat.log.push(c.name.split(' ')[0]+'→'+t.name+' -'+d);if(t.hp<=0){combat.log.push(t.name+' DOWN');S.kills++}});
+  if(combat.enemies.every(e=>e.hp<=0)){
+    combat.done=true;let xp=0,g=0;combat.enemies.forEach(e=>{xp+=e.xp;g+=e.g});
+    S.xp+=xp;S.cash+=g;S.earned+=g;S.lifetimeEarned+=g;S.respect++;
+    log('Won! +$'+g+' +'+xp+'XP','v');chkLU();renderC();$('CA').innerHTML='';
+    const wb=el('button','bt go','OK');wb.style.textAlign='center';
+    wb.onclick=()=>{$('CO').style.display='none';
+      // Block capture on combat win
+      if(combat.ctx.startsWith('block_')){const bid=parseInt(combat.ctx.replace('block_',''));const b=S.city?.blocks.find(x=>x.id===bid);if(b){b.owned=true;if(b.familyIdx!==undefined){S.city.families[b.familyIdx].blocks=S.city.families[b.familyIdx].blocks.filter(id=>id!==b.id);b.familyIdx=undefined}b.owner=null;S.respect+=2;showR('Block Taken!','🏴',[b.name+' is yours.','+2 Respect','Set up an operation!'],'OK','upAll()');return}}
+      // Family boss damage
+      if(combat.ctx.startsWith('fam_')){const fi=parseInt(combat.ctx.replace('fam_',''));const fam=S.city?.families[fi];if(fam){const dmg=rnd(25,45)+S.lv*4;fam.bossHP=Math.max(0,fam.bossHP-dmg);if(fam.bossHP<=0){const bounty=300*(fi+1);S.cash+=bounty;S.earned+=bounty;S.lifetimeEarned+=bounty;S.respect+=10;// Release their blocks
+          fam.blocks.forEach(bid=>{const b=S.city.blocks.find(x=>x.id===bid);if(b){b.familyIdx=undefined;b.owner={name:mkN(),trait:rA(TRAITS),str:rnd(10,25),willSell:R()<.5,sellPrice:rnd(60,150)}}});
+          fam.blocks=[];log('💀 '+fam.boss+' ELIMINATED!','q');showR('BOSS DOWN!','💀',[fam.boss+' is finished.','+$'+fmt(bounty),'+10 Respect','Their blocks are up for grabs!'],'OK','upAll()',bounty);return}
+        else log('Damaged '+fam.boss+'. -'+dmg+'HP.','v')}}
+      if(combat.ctx==='police'){S.jails++;S.heat=Math.max(0,S.heat-25)}
+      upAll();showR('Victory!','🏆',['+$'+g,'+'+xp+' XP'],'OK','')};
+    $('CA').appendChild(wb);return;
+  }
+  combat.enemies.forEach(e=>{if(e.hp<=0)return;const tgts=[{n:S.name,ref:'p'},...S.circle.filter(c=>c.hp>0).map(c=>({n:c.name,ref:c}))];const t=rA(tgts);const dv=t.ref==='p'?defT():(t.ref.d||0);let d=Math.max(1,e.a-Math.floor(dv/2)+rnd(-1,2));
+    if(t.ref==='p'&&hasAb('bodyguard')&&R()<.25){const bg=S.circle.find(c=>c.hp>0&&c.ab==='bodyguard');if(bg){bg.hp=Math.max(0,bg.hp-d);combat.log.push(bg.name.split(' ')[0]+' blocks! -'+d);if(bg.hp<=0){combat.log.push(bg.name.split(' ')[0]+' DOWN!');log('💀 '+bg.name+' killed!','c')}return}}
+    if(t.ref==='p'){S.hp=Math.max(0,S.hp-d);combat.log.push(e.name+'→You -'+d)}else{t.ref.hp=Math.max(0,t.ref.hp-d);combat.log.push(e.name+'→'+t.n.split(' ')[0]+' -'+d);if(t.ref.hp<=0){combat.log.push(t.n.split(' ')[0]+' DOWN!');log('💀 '+t.n+' killed!','c')}}});
+  if(S.hp<=0){combat.done=true;S.hp=1;const lost=Math.floor(S.cash*.2);S.cash=Math.max(0,S.cash-lost);S.combo=0;renderC();$('CA').innerHTML='';const wb=el('button','bt dn','Accept');wb.style.textAlign='center';wb.onclick=()=>{$('CO').style.display='none';if(combat.ctx==='police'){S.jails++;S.heat=Math.max(0,S.heat-30)}log('Defeated. -$'+lost,'c');upAll();showR('Defeated','💀',['-$'+lost],'OK','')};$('CA').appendChild(wb);return}
+  S.circle=S.circle.filter(c=>c.hp>0);renderC();
+}
+function escapeBonus(){return (hasAb('getaway')?30:0)+S.spd*5}
+
+// ======================================================
+// LEVEL UP
+// ======================================================
+function chkLU(){while(S.xp>=xpN(S.lv)){S.xp-=xpN(S.lv);S.lv++;S.sp++;S.mhp+=4;S.hp=Math.min(S.hp+10,S.mhp);log('⭐ Lv'+S.lv+' '+getRank().n,'q');notify('LEVEL '+S.lv)}if(S.sp>0)setTimeout(()=>{if(S.sp>0)openLU()},300)}
+function openLU(){window._lu={atk:0,def:0,spd:0};rLU()}
+function rLU(){const pts=S.sp-Object.values(window._lu).reduce((a,b)=>a+b,0);openD(`<div style="text-align:center"><div style="font-size:40px">⭐</div><div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gd);letter-spacing:2px;margin:4px 0">LEVEL UP</div><div style="font-size:10px;margin-bottom:8px">Points: <b style="color:var(--gd)">${pts}</b></div>${[['⚔ATK','atk'],['🛡DEF','def'],['💨SPD','spd']].map(([l,k])=>`<div style="display:flex;align-items:center;gap:5px;padding:5px;margin:2px 0;background:var(--bg);border-radius:5px"><div style="flex:1;text-align:left;font-size:11px;font-weight:600">${l} <span style="font-size:9px;color:var(--t3)">${S[k]}→${S[k]+window._lu[k]}</span></div><button class="bt sm" onclick="aLU('${k}',-1)"${window._lu[k]<=0?' disabled':''}>−</button><div style="font-size:16px;font-weight:700;width:22px;text-align:center;color:var(--gd)">${window._lu[k]}</div><button class="bt sm go" onclick="aLU('${k}',1)"${pts<=0?' disabled':''}>+</button></div>`).join('')}<button class="bt go" style="text-align:center;margin-top:8px" onclick="cLU()">CONFIRM</button></div>`)}
+function aLU(k,d){const pts=S.sp-Object.values(window._lu).reduce((a,b)=>a+b,0);if(d>0&&pts<=0)return;if(d<0&&window._lu[k]<=0)return;window._lu[k]+=d;rLU()}
+function cLU(){const r=S.sp-Object.values(window._lu).reduce((a,b)=>a+b,0);if(r>0)return notify(r+' pts left');Object.entries(window._lu).forEach(([k,v])=>S[k]+=v);S.sp=0;closeD();upAll()}
+
+// ======================================================
+// DAY TICK
+// ======================================================
+function dayTick(){
+  if(S.heat>0)S.heat=Math.max(0,S.heat-rnd(1,S.heat>=60?1:2));
+  if(hasAb('fixer'))S.heat=Math.max(0,S.heat-2);
+  if(hasAb('getaway'))S.heat=Math.max(0,S.heat-1);
+
+  // WEEKLY
+  if(S.day%7===0&&S.day!==S.lastPay){
+    S.lastPay=S.day;
+    const inc=Math.floor(blockIncome()*prestigeM());const up=weeklyUp();
+    if(inc>0){S.cash+=inc;S.earned+=inc;S.lifetimeEarned+=inc;log('💰 Income: +$'+inc,'v')}
+    if(up>0){if(S.cash>=up){S.cash-=up;log('💰 Upkeep: -$'+up,'n')}else{S.cash=0;S.circle.forEach(c=>c.loy=Math.max(0,c.loy-rnd(10,20)));if(S.soldiers>0){const d=Math.ceil(S.soldiers*.2);S.soldiers=Math.max(0,S.soldiers-d);log('💀 '+d+' soldiers deserted.','c')}log('⚠ Can\'t pay upkeep!','c')}}
+    // Block operation heat
+    if(S.city)S.city.blocks.filter(b=>b.owned&&b.op).forEach(b=>{const op=OPS.find(x=>x.id===b.op);if(op&&op.heat>0)S.heat=Math.min(100,S.heat+op.heat)});
+    // Loan
+    if(S.loan>0){const int=Math.ceil(S.loan*.15);S.loan+=int;log('🦈 Interest +$'+int+'. Owed $'+S.loan,'c');if(S.loan>500&&R()<.15){log('🦈 Enforcers!','c');setTimeout(()=>startCombat([mkE('enforcer'),mkE('enforcer')],'loan'),400)}}
+    // Loyalty decay
+    S.circle.forEach(c=>{c.loy=Math.max(0,c.loy-rnd(2,5));if(c.loy<=15&&R()<.3){log('💔 '+c.name+' betrayed you!','c');S.circle=S.circle.filter(x=>x!==c)}});
+    // Rival family expansion — they fight back!
+    if(S.city)S.city.families.forEach((f,fi)=>{if(f.bossHP<=0||!f.hostile)return;
+      // Attack random owned block
+      const myBlocks=S.city.blocks.filter(b=>b.owned);
+      if(myBlocks.length&&R()<.15+fi*.05){
+        const target=rA(myBlocks);
+        if(S.soldiers>0&&R()<.6){S.soldiers--;log('⚔ '+f.name+' attacked '+target.name+'! Defended (lost 1 soldier).','c')}
+        else{target.owned=false;target.op=null;target.familyIdx=fi;f.blocks.push(target.id);target.owner={name:rA(FM)+' '+f.name.split(' ')[1],trait:rA(TRAITS),str:rnd(20,40)};log('⚔ '+f.name+' TOOK '+target.name+'!','c')}
+      }
+      // Soldier attrition
+      if(S.soldiers>0&&R()<.05){S.soldiers--;log('💀 Soldier killed in skirmish.','c')}
+    });
+  }
+
+  // Hot tip
+  if(!S.hotTip&&R()<.1&&S.crimes>=3){const avail=CRIMES.filter(c=>c.tier<=Math.floor(S.lv/3));const tip=rA(avail);S.hotTip={crime:tip.id,mult:rA([2,2,3]),exp:S.day+rnd(2,4)};log('🔥 HOT TIP: '+tip.n+' '+S.hotTip.mult+'×!','q')}
+  if(S.hotTip&&S.hotTip.exp<=S.day)S.hotTip=null;
+
+  // Events
+  if(R()<.06&&!S.pendingEvent)genEvent();
+  save();
+}
+
+function genEvent(){
+  const pool=[];
+  if(S.circle.length)pool.push('arrest','betray');
+  if(S.respect>=10)pool.push('alliance');
+  if(S.heat>=30)pool.push('cop_shake');
+  if(ownedBlocks()>0)pool.push('turf_hit');
+  pool.push('opportunity');
+  if(!pool.length)return;
+  const evId=rA(pool);let title,desc,opts;
+  switch(evId){
+    case'arrest':{const c=rA(S.circle);const bail=rnd(50,150);title='🚔 ARRESTED';desc=c.name+' got picked up.';opts=[{label:'Pay bail $'+bail,fn:()=>{if(S.cash<bail)return notify('Need $'+bail);S.cash-=bail;c.loy=Math.min(100,c.loy+15)}},{label:'Let them rot',fn:()=>{S.circle=S.circle.filter(x=>x!==c)}}];break}
+    case'betray':{const c=rA(S.circle);const stolen=rnd(30,100);title='💔 BETRAYAL';desc=c.name+' is skimming!';opts=[{label:'Confront (fight)',fn:()=>startCombat([mkE('enforcer')],'betray')},{label:'Forgive -$'+stolen,fn:()=>{S.cash=Math.max(0,S.cash-stolen);c.loy=Math.min(100,c.loy+20)}}];break}
+    case'alliance':{title='🤝 ALLIANCE OFFER';desc='A rival wants peace.';opts=[{label:'Accept (-10 heat)',fn:()=>{S.heat=Math.max(0,S.heat-10)}},{label:'Refuse (+5 respect)',fn:()=>{S.respect+=5}}];break}
+    case'cop_shake':{const cost=rnd(40,120);title='👮 SHAKEDOWN';desc='Cop wants more.';opts=[{label:'Pay $'+cost,fn:()=>{if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;S.heat=Math.max(0,S.heat-8)}},{label:'Threaten (+10 heat, +3 rep)',fn:()=>{S.heat=Math.min(100,S.heat+10);S.respect+=3}}];break}
+    case'turf_hit':{const blocks=S.city?S.city.blocks.filter(b=>b.owned):[];if(!blocks.length)return;const b=rA(blocks);title='⚔ TURF ATTACK';desc='Rivals hitting '+b.name+'!';opts=[{label:'Defend (fight)',fn:()=>startCombat([mkE('rival'),mkE('gang')],'block_def')},{label:'Abandon block',fn:()=>{b.owned=false;b.op=null}}];break}
+    case'opportunity':{const cash=rnd(80,300);title='💰 OPPORTUNITY';desc='Quick score dropped in your lap.';opts=[{label:'Take it',fn:()=>{if(R()<.6){S.cash+=cash;S.earned+=cash;S.lifetimeEarned+=cash;juice('cash',cash)}else{S.hp=Math.max(1,S.hp-rnd(5,15));S.heat=Math.min(100,S.heat+5)}}},{label:'Pass',fn:()=>{}}];break}
+  }
+  S.pendingEvent={title,desc,opts};
+}
+
+// ======================================================
+// NEW GAME
+// ======================================================
+function confirmNew(){openD(`<div style="text-align:center"><div style="font-size:40px">⚠️</div><div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gd);margin:4px 0">START OVER?</div><button class="bt dn" style="text-align:center" onclick="doNew()">Delete</button><button class="bt" style="text-align:center" onclick="closeD()">Cancel</button></div>`)}
+function doNew(){localStorage.removeItem('maf5');S=null;closeD();setTimeout(newGame,100)}
+function newGame(){
+  S=clone(BASE);const nm=mkN();window._nn=nm;
+  const BG=[{n:'Street Kid',d:'Corners and concrete.',cash:40,atk:4,def:2,spd:4,items:['knife','bandage'],e:'🏃'},{n:'Ex-Bouncer',d:'Fists solve problems.',cash:60,atk:6,def:4,spd:2,items:['bat','medkit'],e:'💪'},{n:'Hustler',d:'Always an angle.',cash:100,atk:3,def:2,spd:5,items:['bandage','bandage'],e:'🎲'},{n:'Soldier',d:'Did time. Earned.',cash:50,atk:5,def:3,spd:3,items:['pistol','bandage'],e:'🔫'},{n:'Burglar',d:'Silent. Quick.',cash:70,atk:3,def:2,spd:6,items:['knife','bandage'],e:'🐱'}];
+  const bg=rA(BG);window._bg=bg;
+  openD(`<div style="text-align:center"><div style="font-size:48px;margin-bottom:4px">${bg.e}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px">${nm}</div><div style="font-size:12px;color:var(--gd);font-weight:600;margin:3px 0">${bg.n}</div><div style="font-size:11px;color:var(--t3);font-style:italic;margin-bottom:10px">${bg.d}</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;font-size:10px;margin-bottom:10px"><div style="background:var(--bg);padding:5px;border-radius:4px">⚔${bg.atk}</div><div style="background:var(--bg);padding:5px;border-radius:4px">🛡${bg.def}</div><div style="background:var(--bg);padding:5px;border-radius:4px">💨${bg.spd}</div></div><button class="bt go" style="text-align:center" onclick="startG()">BEGIN</button><button class="bt" style="text-align:center" onclick="closeD();newGame()">🔄 REROLL</button></div>`);
+}
+function startG(){
+  const bg=window._bg;S.name=window._nn;S.atk=bg.atk;S.def=bg.def;S.spd=bg.spd;S.cash=bg.cash;S.inv=clone(bg.items);S.mhp=50+bg.def*3;S.hp=S.mhp;
+  S.city=genCity();
+  closeD();log(S.name+' arrives in '+S.city.name+'.','q');log(S.city.blocks.length+' blocks to conquer.','n');upAll();sw('hub');save();
+}
+
+// ======================================================
+// INIT
+// ======================================================
+function init(){if(!load())newGame();else{const t=Math.floor(Date.now()/864e5);if(S.lastPlayed===t-1){S.streak++;if(S.streak%3===0){const b=S.streak*20;S.cash+=b;S.earned+=b;S.lifetimeEarned+=b;log('🔥 '+S.streak+'-day streak! +$'+b,'q')}}else if(S.lastPlayed!==t)S.streak=1;S.lastPlayed=t;save();upAll();sw('hub')}}
+window.onload=init;
+window.onerror=(m,u,l)=>{console.error('E:',m,l);return true};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S)save()});
+window.addEventListener('pagehide',()=>{if(S)save()});
+</script>
+</body>
+</html>
