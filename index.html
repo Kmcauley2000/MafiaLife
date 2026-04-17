@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#050508">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-<link rel="icon" type="image/png" href="./apple-touch-icon.png">
 <title>Mafia Life</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
@@ -65,6 +63,14 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--t1);min-h
 .cu{background:var(--c2);border:1px solid var(--bd);border-radius:6px;padding:5px;text-align:center;flex:1 1 55px;min-width:48px;max-width:90px;position:relative}
 .cu .ue{font-size:22px}.cu .un{font-size:7px;font-weight:700;margin:1px 0}.cu .uh{font-size:7px;color:var(--t3)}.cu.dead{opacity:.15;transform:scale(.85)}
 .ht{background:linear-gradient(135deg,#140404,#200808);border:1px solid var(--rd2);border-radius:8px;padding:9px;margin:4px 0}
+/* BUILDING OVERLAY */
+#BO{position:fixed;inset:0;background:rgba(0,0,0,.96);display:none;z-index:250;overflow-y:auto}#BO.A{display:block}
+#BI{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--bg)}
+.bh{background:var(--c1);color:var(--gd);padding:calc(var(--st)+8px) 10px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:10}
+.bb{font-size:18px;cursor:pointer;padding:6px 10px;border-radius:6px;background:rgba(255,255,255,.04);min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center}
+.ba{padding:10px 12px;font-size:12px;font-style:italic;color:var(--t3);line-height:1.6;border-bottom:1px solid var(--bd)}
+.bp{padding:10px 12px}
+.bs{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:2px;margin:14px 0 5px;padding-bottom:3px;border-bottom:1px solid var(--bd)}
 /* Block card */
 .blk{background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:9px;margin:3px 0;cursor:pointer;transition:all .1s}
 .blk:active{transform:scale(.98)}.blk.owned{border-left:3px solid var(--gd3)}.blk.rival{border-left:3px solid var(--rd2)}.blk.free{border-left:3px solid var(--t3)}
@@ -85,6 +91,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--t1);min-h
 </div>
 <div id="CO" style="display:none"><div id="CP"><div style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--rd);letter-spacing:3px;margin-bottom:5px;border-bottom:1px solid var(--bd);padding-bottom:3px">FIGHT</div><div id="EA" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px"></div><div id="AA" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px"></div><div id="CL" style="max-height:70px;overflow-y:auto;font-size:9px;background:var(--bg);color:var(--t3);border-radius:4px;padding:4px 6px;margin:3px 0;line-height:1.6"></div><div id="CA" style="display:flex;gap:3px;margin-top:3px"></div></div></div>
 <div id="OV"><div id="OB"></div></div>
+<div id="BO"><div id="BI"></div></div>
 <div id="RX"></div><div id="RP"></div><div id="NF"></div>
 </div>
 <script>
@@ -211,7 +218,7 @@ cop:{n:"Cop",e:"👮",hp:32,a:5,d:5,xp:8,g:0},swat:{n:"SWAT",e:"🛡",hp:55,a:8,
 enforcer:{n:"Enforcer",e:"💀",hp:48,a:8,d:4,xp:15,g:20},rival:{n:"Rival Soldier",e:"⚔",hp:35,a:6,d:3,xp:10,g:15},
 boss:{n:"Boss",e:"🤵",hp:90,a:14,d:9,xp:50,g:100},bouncer:{n:"Bouncer",e:"💪",hp:45,a:5,d:6,xp:10,g:15}
 };
-function mkE(type,extraScale){const t=ENEMIES[type]||ENEMIES.thug;const s=1+threatLv()*.05+(extraScale||0);return{name:t.n,e:t.e,hp:Math.round(t.hp*s),mhp:Math.round(t.hp*s),a:Math.round(t.a*s),d:Math.round(t.d*s),xp:t.xp,g:Math.round(t.g*s)}}
+function mkE(type,extraScale){const t=ENEMIES[type]||ENEMIES.thug;const s=(1+threatLv()*.05+(extraScale||0))*threatScale();return{name:t.n,e:t.e,hp:Math.round(t.hp*s),mhp:Math.round(t.hp*s),a:Math.round(t.a*s),d:Math.round(t.d*s),xp:t.xp,g:Math.round(t.g*s)}}
 
 const CRIMES=[
 {id:"pick",n:"Pickpocket",e:"🤏",tier:0,cash:[8,25],xp:4,ht:1,cd:0,base:88,fd:[0,2],fl:[0,3]},
@@ -247,12 +254,33 @@ city:null,// the procedural city
 respect:0,kills:0,crimes:0,earned:0,jails:0,
 crimeCD:{},day:1,log:[],
 combo:0,maxCombo:0,hotTip:null,
-prestige:0,lifetimeEarned:0,
+prestige:0,lifetimeEarned:0,totalCities:0,
 loan:0,workedDay:0,streak:0,lastPlayed:0,lastPay:0,
-pendingEvent:null,curBlock:0};
+pendingEvent:null,curBlock:0,
+// THREAT — permanent escalation that never goes down. The empire's ticking clock.
+threat:0,safeLv:0,soldierCost:10};
 
 function save(){try{localStorage.setItem('maf5',JSON.stringify(S))}catch(e){}}
-function load(){const d=localStorage.getItem('maf5');if(d){try{S=JSON.parse(d);return true}catch(e){}}return false}
+function load(){const d=localStorage.getItem('maf5');if(d){try{S=JSON.parse(d);
+  // Migrations
+  if(!S.circle)S.circle=[];if(!S.soldiers)S.soldiers=0;if(!S.maxSoldiers)S.maxSoldiers=5;
+  if(!S.contacts)S.contacts=[];if(!S.pendingEvent)S.pendingEvent=null;
+  if(S.safeLv===undefined||S.safeLv===null)S.safeLv=0;
+  if(!S.respect)S.respect=0;if(!S.workedDay)S.workedDay=0;
+  if(!S.lastPay)S.lastPay=0;if(!S.loan)S.loan=0;
+  if(S.curBlock===undefined)S.curBlock=0;
+  if(!S.soldierCost)S.soldierCost=10;
+  if(S.threat===undefined)S.threat=0;
+  if(!S.totalCities)S.totalCities=0;
+  // Hydrate city block typeData references after JSON parse
+  if(S.city&&S.city.blocks){
+    const typeMap={};BLOCK_TYPES.forEach(t=>typeMap[t.id]=t);
+    S.city.blocks.forEach(b=>{
+      if(!b.typeData||!b.typeData.e){b.typeData=typeMap[b.type]||BLOCK_TYPES[0]}
+      if(b.opLv===undefined)b.opLv=1;
+    });
+  }
+  return true}catch(e){console.error('Load error:',e)}}return false}
 
 // ======================================================
 // CALCS
@@ -269,10 +297,31 @@ function comboM(){return 1+S.combo*.1}
 function prestigeM(){return 1+S.prestige*.1}
 function heatPen(){return S.heat>=80?.3:S.heat>=60?.15:S.heat>=40?.05:0}
 // Income from owned blocks
-function blockIncome(){if(!S.city)return 0;let t=0;S.city.blocks.filter(b=>b.owned).forEach(b=>{t+=b.income;if(b.op){const o=OPS.find(x=>x.id===b.op);if(o)t+=o.inc*(b.opLv||1)}});return Math.floor(t*(1-heatPen()))}
+function blockIncome(){if(!S.city)return 0;let t=0;S.city.blocks.filter(b=>b.owned).forEach(b=>{t+=Math.floor(b.income*(b.blockLv||1));if(b.op){const o=OPS.find(x=>x.id===b.op);if(o)t+=o.inc*(b.opLv||1)}});return Math.floor(t*(1-heatPen()))}
 function weeklyUp(){let u=0;S.circle.forEach(c=>u+=c.wage);u+=S.soldiers*10;if(S.loan>0)u+=Math.ceil(S.loan*.15);return u}
 function maxSoldiers(){return 5+S.lv*3+Math.floor(S.respect/2)}
 function ownedBlocks(){return S.city?S.city.blocks.filter(b=>b.owned).length:0}
+// Safe block data accessors
+function bE(b){return b.typeData?.e||{commercial:'🏢',residential:'🏘',industrial:'🏭',waterfront:'🚢',nightlife:'🌃',slum:'🏚'}[b.type]||'📍'}
+function bN(b){return b.typeData?.n||b.type||'Block'}
+
+// THREAT SYSTEM — permanent escalation
+// Threat rises when you: take blocks, kill bosses, run operations, grow army
+// It NEVER decreases within a city. Only prestige resets it.
+function addThreat(amt){S.threat=Math.min(100,S.threat+(amt||1))}
+function threatDesc(){
+  if(S.threat>=90)return{lv:5,n:'🔴 CRACKDOWN',d:'Government task force. Military raids. Asset seizure.',clr:'var(--rd)'};
+  if(S.threat>=75)return{lv:4,n:'🟠 RICO',d:'Federal investigation. Businesses at risk.',clr:'#e86020'};
+  if(S.threat>=50)return{lv:3,n:'🟡 FBI',d:'Feds are watching. Informants everywhere.',clr:'var(--gd)'};
+  if(S.threat>=25)return{lv:2,n:'🟢 NOTICED',d:'Rivals getting serious. Cops asking questions.',clr:'var(--gn2)'};
+  return{lv:1,n:'⚪ UNKNOWN',d:'Nobody knows your name yet.',clr:'var(--t3)'};
+}
+// Threat-based enemy scaling — higher threat = tougher everything
+function threatScale(){return 1+S.threat*.008}
+// Threat-based attack frequency on your blocks
+function threatAttackChance(){return .05+S.threat*.002}
+// Threat-based chance of FBI/RICO events
+function threatEventChance(){return S.threat>=50?.04+S.threat*.002:0}
 
 // ======================================================
 // LOGGING
@@ -286,9 +335,9 @@ let curTab='hub';
 function sw(tab){curTab=tab;document.querySelectorAll('.T').forEach(t=>t.classList.remove('A'));document.querySelectorAll('#N button').forEach(b=>b.classList.remove('A'));$(tab+'-tab')?.classList.add('A');$('nb-'+tab)?.classList.add('A');upTab(tab)}
 function upAll(){upStats();upTab(curTab);save()}
 function upStats(){
-  const r=getRank(),net=blockIncome()-weeklyUp();
+  const r=getRank(),net=blockIncome()-weeklyUp(),td=threatDesc();
   $('TR').textContent=S.city?S.city.name+' · Day '+S.day+(S.combo>1?' · ×'+S.combo:''):'Day '+S.day;
-  $('TS').innerHTML=`<div class="st"><div class="sl">CASH</div><div class="sv sv-c">$${fmt(S.cash)}</div></div><div class="st${S.heat>=70?' dng':''}"><div class="sl">HEAT</div><div class="sv sv-h">${S.heat}%</div></div><div class="st"><div class="sl">HP</div><div class="sv sv-p">${S.hp}</div></div><div class="st"><div class="sl">REP</div><div class="sv sv-r">${S.respect}</div></div><div class="st"><div class="sl">${r.e}Lv${S.lv}</div><div class="sv sv-l">${r.n}</div></div>`;
+  $('TS').innerHTML=`<div class="st"><div class="sl">CASH</div><div class="sv sv-c">$${fmt(S.cash)}</div></div><div class="st${S.heat>=70?' dng':''}"><div class="sl">HEAT</div><div class="sv sv-h">${S.heat}%</div></div><div class="st"><div class="sl">THREAT</div><div class="sv" style="color:${td.clr}">${S.threat}</div></div><div class="st"><div class="sl">HP</div><div class="sv sv-p">${S.hp}</div></div><div class="st"><div class="sl">${r.e}Lv${S.lv}</div><div class="sv sv-l">${r.n}</div></div>`;
   $('XF').style.width=pct(S.xp,xpN(S.lv))+'%';
 }
 function upTab(t){({hub:upHub,jobs:upJobs,map:upMap,crew:upCrew,you:upYou,log:upLog})[t]?.()}
@@ -315,6 +364,12 @@ function upHub(){
   hc.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span>🔥 Heat</span><span style="color:var(--ht)">${S.heat}%</span></div><div class="bar"><div class="bf" style="width:${S.heat}%;background:linear-gradient(90deg,var(--ht),var(--rd))"></div></div>`;
   tab.appendChild(hc);
 
+  // THREAT — the permanent escalation bar
+  const td=threatDesc();
+  const tc2=el('div','cd'+(S.threat>=75?' dn':''));
+  tc2.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span>⚠ Threat</span><span style="color:${td.clr};font-weight:700">${td.n}</span></div><div class="bar"><div class="bf" style="width:${S.threat}%;background:linear-gradient(90deg,var(--gd3),${S.threat>=75?'var(--rd)':S.threat>=50?'var(--gd)':'var(--gn2)'})"></div></div><div style="font-size:9px;color:var(--t3);margin-top:2px">${td.d}${S.threat>=50?' · <b>Prestige to escape.</b>':''}</div>`;
+  tab.appendChild(tc2);
+
   // Hot tip
   if(S.hotTip&&S.hotTip.exp>S.day){const cr=CRIMES.find(c=>c.id===S.hotTip.crime);if(cr){const ht=el('div','ht');ht.innerHTML=`<div style="font-size:10px;color:var(--rd);font-weight:700;margin-bottom:2px">🔥 HOT TIP · ${S.hotTip.exp-S.day}d LEFT</div><div style="font-size:11px">${cr.e} ${cr.n} — <span style="color:var(--gd)">${S.hotTip.mult}×</span></div>`;const hb=el('button','bt dn','⚡ Go to Jobs');hb.onclick=()=>sw('jobs');ht.appendChild(hb);tab.appendChild(ht)}}
 
@@ -332,25 +387,12 @@ function upHub(){
   // Recruit soldiers
   if(S.soldiers<maxSoldiers()){const rc=25;const rb2=el('button','bt','🔫 Recruit soldier $'+rc);rb2.onclick=()=>{if(S.cash<rc)return notify('Need $'+rc);S.cash-=rc;S.soldiers++;upAll()};tab.appendChild(rb2)}
 
-  // Rival families
-  tab.appendChild(el('div','sh','Rival Families'));
-  S.city.families.forEach((f,fi)=>{
-    if(f.bossHP<=0)return;
-    const fc=el('div','cd'+(f.hostile?' dn':''));
-    const ownedByFam=S.city.blocks.filter(b=>b.familyIdx===fi&&!b.owned).length;
-    fc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:24px">${f.hostile?'⚔':'🤝'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${f.name}</div><div style="font-size:10px;color:var(--t3)">Boss: ${f.boss} · ${ownedByFam} blocks · Str ${f.str}</div></div></div><div style="margin-top:4px"><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3)"><span>Boss HP</span><span>${f.bossHP}/${f.bossMaxHP}</span></div><div class="bar"><div class="bf" style="width:${pct(f.bossHP,f.bossMaxHP)}%;background:var(--rd)"></div></div></div>`;
-    if(f.hostile&&S.lv>=(fi+1)*5){const ab=el('button','bt dn','⚔ Attack Boss');ab.onclick=()=>{const e=[mkE('boss',fi*.15)];if(fi>=1)e.push(mkE('hitman',fi*.1));startCombat(e,'fam_'+fi)};fc.appendChild(ab)}
-    else if(f.hostile){fc.appendChild(el('div','','<div style="font-size:9px;color:var(--t3);text-align:center;margin-top:3px">Req Lv'+(fi+1)*5+'</div>'))}
-    if(!f.hostile){const hb=el('button','bt','😤 Provoke war');hb.onclick=()=>{f.hostile=true;S.respect+=3;log('Declared war on '+f.name+'.','q');upAll()};fc.appendChild(hb)}
-    tab.appendChild(fc);
-  });
-
   // CURRENT LOCATION — shows buildings based on block type
   tab.appendChild(el('div','sh','Your Area'));
   const curBlk=S.city.blocks[S.curBlock||0];
   if(curBlk){
     const locCard=el('div','cd');
-    locCard.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:24px">${curBlk.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:13px">${curBlk.name}</div><div style="font-size:10px;color:var(--t3)">${curBlk.typeData?.n||curBlk.type}${curBlk.owned?' · <span style="color:var(--gn)">YOUR TURF</span>':curBlk.familyIdx!==undefined?' · <span style="color:var(--rd)">'+S.city.families[curBlk.familyIdx]?.name+'</span>':''}</div></div></div>`;
+    locCard.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:24px">${bE(curBlk)}</div><div style="flex:1"><div style="font-weight:700;font-size:13px">${curBlk.name}</div><div style="font-size:10px;color:var(--t3)">${bN(curBlk)}${curBlk.owned?' · <span style="color:var(--gn)">YOUR TURF</span>':curBlk.familyIdx!==undefined?' · <span style="color:var(--rd)">'+S.city.families[curBlk.familyIdx]?.name+'</span>':''}</div></div></div>`;
     // Move to different block
     const mb=el('button','bt sm','📍 Change location');
     mb.onclick=()=>{
@@ -358,7 +400,7 @@ function upHub(){
       S.city.blocks.forEach((b,i)=>{
         if(i===S.curBlock)return;
         const isOwned=b.owned;const isRival=b.familyIdx!==undefined&&!b.owned;
-        h+=`<button class="bt" style="text-align:left" onclick="S.curBlock=${i};closeD();upAll()"><span style="font-size:14px">${b.typeData?.e||'📍'}</span> ${b.name} <span style="font-size:9px;color:${isOwned?'var(--gn)':isRival?'var(--rd)':'var(--t3)'}">${isOwned?'YOURS':isRival?S.city.families[b.familyIdx]?.name||'Rival':'—'}</span></button>`;
+        h+=`<button class="bt" style="text-align:left" onclick="S.curBlock=${i};closeD();upAll()"><span style="font-size:14px">${bE(b)}</span> ${b.name} <span style="font-size:9px;color:${isOwned?'var(--gn)':isRival?'var(--rd)':'var(--t3)'}">${isOwned?'YOURS':isRival?S.city.families[b.familyIdx]?.name||'Rival':'—'}</span></button>`;
       });
       h+='<button class="bt" style="text-align:center" onclick="closeD()">← Back</button>';
       openD(h);
@@ -531,6 +573,7 @@ function bDruglab(body,home){
 }
 
 function bSafehouse(body){
+  if(S.safeLv===undefined||S.safeLv===null)S.safeLv=0;
   const hRed=5+S.safeLv*2;
   const rb=el('button','bt go','😴 Sleep · full heal -'+hRed+' heat');rb.onclick=()=>{S.hp=S.mhp;S.day++;S.workedDay=0;S.heat=Math.max(0,S.heat-hRed);S.combo=0;S.circle.forEach(c=>c.hp=Math.min(c.mhp,c.hp+Math.floor(c.mhp*.25)));dayTick();$('BO').classList.remove('A');upAll();showR('Rested','😴',['Fully healed','Circle partially healed','-'+hRed+' Heat'],'OK','')};body.appendChild(rb);
   const uc=(S.safeLv+1)*300;
@@ -552,9 +595,10 @@ function upMap(){
   tab.appendChild(el('div','sh','Your Blocks ('+owned.length+')'));
   if(owned.length){
     owned.forEach(b=>{
-      const op=b.op?OPS.find(x=>x.id===b.op):null;
+      const op=b.op?OPS.find(x=>x.id===b.op):null;const bLv=b.blockLv||1;
+      const totalInc=Math.floor(b.income*bLv)+(op?op.inc*(b.opLv||1):0);
       const bc=el('div','blk owned');
-      bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${b.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--t3)">${b.typeData?.n||b.type}${op?' · '+op.e+' '+op.n+' Lv'+(b.opLv||1):' · No operation'}</div><div style="font-size:10px;color:var(--gn)">+$${b.income+(op?op.inc*(b.opLv||1):0)}/wk</div></div></div>`;
+      bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${bE(b)}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name} <span style="font-size:9px;color:var(--gd)">Lv${bLv}</span></div><div style="font-size:10px;color:var(--t3)">${bN(b)}${op?' · '+op.e+' '+op.n+' Lv'+(b.opLv||1):' · No operation'}</div><div style="font-size:10px;color:var(--gn)">+$${totalInc}/wk</div></div></div>`;
       bc.onclick=()=>openBlock(b);
       tab.appendChild(bc);
     });
@@ -563,7 +607,7 @@ function upMap(){
   tab.appendChild(el('div','sh','Unclaimed ('+free.length+')'));
   free.forEach(b=>{
     const bc=el('div','blk free');
-    bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${b.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--t3)">${b.typeData?.n||b.type} · ${b.owner?b.owner.name+' ('+b.owner.trait+')':'Unclaimed'}</div><div style="font-size:10px;color:var(--t2)">Base income: $${b.income}/wk</div></div></div>`;
+    bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${bE(b)}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--t3)">${bN(b)} · ${b.owner?b.owner.name+' ('+b.owner.trait+')':'Unclaimed'}</div><div style="font-size:10px;color:var(--t2)">Base income: $${b.income}/wk</div></div></div>`;
     bc.onclick=()=>openTakeBlock(b);
     tab.appendChild(bc);
   });
@@ -573,38 +617,71 @@ function upMap(){
     rival.forEach(b=>{
       const fam=S.city.families[b.familyIdx];
       const bc=el('div','blk rival');
-      bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${b.typeData?.e||'📍'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--rd)">${fam?.name||'Rival'} · ${b.owner?.name||'Unknown'}</div><div style="font-size:10px;color:var(--t2)">$${b.income}/wk · Str ${b.owner?.str||'?'}</div></div></div>`;
+      bc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${bE(b)}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${b.name}</div><div style="font-size:10px;color:var(--rd)">${fam?.name||'Rival'} · ${b.owner?.name||'Unknown'}</div><div style="font-size:10px;color:var(--t2)">$${b.income}/wk · Str ${b.owner?.str||'?'}</div></div></div>`;
       bc.onclick=()=>openTakeBlock(b);
       tab.appendChild(bc);
     });
   }
+
+  // RIVAL FAMILIES — moved here from hub
+  tab.appendChild(el('div','sh','Rival Families'));
+  S.city.families.forEach((f,fi)=>{
+    const ownedByFam=S.city.blocks.filter(b=>b.familyIdx===fi&&!b.owned).length;
+    const fc=el('div','cd'+(f.hostile?' dn':''));
+    if(f.bossHP<=0){
+      fc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:24px">💀</div><div style="flex:1"><div style="font-weight:700;font-size:12px;text-decoration:line-through;color:var(--t3)">${f.name}</div><div style="font-size:10px;color:var(--t3)">Eliminated · ${f.boss} is dead</div></div></div>`;
+    } else {
+      fc.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="font-size:24px">${f.hostile?'⚔':'🤝'}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${f.name}</div><div style="font-size:10px;color:var(--t3)">Boss: ${f.boss} · ${ownedByFam} blocks · Str ${f.str}</div></div></div><div style="margin-top:4px"><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3)"><span>Boss HP</span><span>${f.bossHP}/${f.bossMaxHP}</span></div><div class="bar"><div class="bf" style="width:${pct(f.bossHP,f.bossMaxHP)}%;background:var(--rd)"></div></div></div>`;
+      if(f.hostile&&S.lv>=(fi+1)*5){const ab=el('button','bt dn','⚔ Attack Boss');ab.onclick=()=>{const e=[mkE('boss',fi*.15)];if(fi>=1)e.push(mkE('hitman',fi*.1));startCombat(e,'fam_'+fi)};fc.appendChild(ab)}
+      else if(f.hostile){fc.appendChild(el('div','','<div style="font-size:9px;color:var(--t3);text-align:center;margin-top:3px">Req Lv'+(fi+1)*5+'</div>'))}
+      if(!f.hostile){const hb=el('button','bt','😤 Provoke war');hb.onclick=()=>{f.hostile=true;S.respect+=3;log('Declared war on '+f.name+'.','q');upAll()};fc.appendChild(hb)}
+    }
+    tab.appendChild(fc);
+  });
 }
 
 function openBlock(b){
-  // Manage owned block
   const op=b.op?OPS.find(x=>x.id===b.op):null;
-  let h=`<div style="text-align:center"><div style="font-size:36px">${b.typeData?.e||'📍'}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin:4px 0">${b.name}</div><div style="font-size:11px;color:var(--t2);margin-bottom:8px">${b.typeData?.n||b.type} · +$${b.income+(op?op.inc*(b.opLv||1):0)}/wk</div></div>`;
+  const bLv=b.blockLv||1;const maxBLv=5;
+  const totalInc=Math.floor(b.income*bLv)+(op?op.inc*(b.opLv||1):0);
+  let h=`<div style="text-align:center"><div style="font-size:36px">${bE(b)}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin:4px 0">${b.name}</div><div style="font-size:11px;color:var(--t2);margin-bottom:4px">${bN(b)} · Block Lv${bLv} · +$${totalInc}/wk</div></div>`;
+  // BLOCK UPGRADE — increase base income but raises threat
+  if(bLv<maxBLv){
+    const blkUpCost=bLv*150+50;const incGain=b.income;
+    h+=`<button class="bt go" style="text-align:center" onclick="upgradeBlock(${b.id})">🏗 Upgrade Block to Lv${bLv+1} · $${blkUpCost} · +$${incGain}/wk · ⚠+1 Threat</button>`;
+  } else {
+    h+=`<div style="font-size:10px;color:var(--gd);text-align:center;margin:4px 0">🏗 Block MAX LEVEL</div>`;
+  }
+  h+=`<div style="height:1px;background:var(--bd);margin:8px 0"></div>`;
   if(op){
     h+=`<div style="font-size:11px;color:var(--gn);margin-bottom:6px">${op.e} ${op.n} Lv${b.opLv||1} · +$${op.inc*(b.opLv||1)}/wk · +${op.heat} heat/wk</div>`;
     const upgCost=(b.opLv||1)*op.cost;
-    h+=`<button class="bt go" style="text-align:center" onclick="upgradeOp(${b.id})">⬆ Upgrade $${upgCost}</button>`;
+    h+=`<button class="bt go" style="text-align:center" onclick="upgradeOp(${b.id})">⬆ Upgrade Op $${upgCost}</button>`;
     h+=`<button class="bt" style="text-align:center" onclick="removeOp(${b.id})">🗑 Remove operation</button>`;
   } else {
-    h+=`<div style="font-size:11px;color:var(--t3);margin-bottom:8px">No operation running. Set one up:</div>`;
+    h+=`<div style="font-size:11px;color:var(--t3);margin-bottom:8px">No operation. Set one up:</div>`;
     OPS.forEach(op2=>{
       h+=`<button class="bt" style="text-align:center" onclick="setOp(${b.id},'${op2.id}')">${op2.e} ${op2.n} · $${op2.cost} · +$${op2.inc}/wk${op2.heat?' · +'+op2.heat+'🔥/wk':''}</button>`;
     });
   }
-  h+=`<button class="bt dn" style="text-align:center;margin-top:6px" onclick="abandonBlock(${b.id})">🚫 Abandon block</button>`;
+  h+=`<button class="bt dn" style="text-align:center;margin-top:6px" onclick="abandonBlock(${b.id})">🚫 Abandon</button>`;
   h+=`<button class="bt" style="text-align:center" onclick="closeD()">← Back</button>`;
   openD(h);
+}
+
+function upgradeBlock(blockId){
+  const b=S.city.blocks.find(x=>x.id===blockId);if(!b)return;
+  const bLv=b.blockLv||1;const cost=bLv*150+50;
+  if(S.cash<cost)return notify('Need $'+cost);
+  S.cash-=cost;b.blockLv=(b.blockLv||1)+1;addThreat(1);
+  log('🏗 '+b.name+' upgraded to Lv'+b.blockLv+'. +1 threat.','v');closeD();upAll();
 }
 
 function setOp(blockId,opId){
   const b=S.city.blocks.find(x=>x.id===blockId);const op=OPS.find(x=>x.id===opId);
   if(!b||!op)return;if(S.cash<op.cost)return notify('Need $'+op.cost);
-  S.cash-=op.cost;b.op=opId;b.opLv=1;
-  log('Set up '+op.n+' on '+b.name+'.','v');closeD();upAll();
+  S.cash-=op.cost;b.op=opId;b.opLv=1;addThreat(1);
+  log('Set up '+op.n+' on '+b.name+'. +1 threat.','v');closeD();upAll();
 }
 function upgradeOp(blockId){
   const b=S.city.blocks.find(x=>x.id===blockId);if(!b||!b.op)return;
@@ -617,7 +694,7 @@ function removeOp(blockId){const b=S.city.blocks.find(x=>x.id===blockId);if(b)b.
 function abandonBlock(blockId){const b=S.city.blocks.find(x=>x.id===blockId);if(b){b.owned=false;b.op=null}closeD();upAll()}
 
 function openTakeBlock(b){
-  let h=`<div style="text-align:center"><div style="font-size:36px">${b.typeData?.e||'📍'}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin:4px 0">${b.name}</div><div style="font-size:11px;color:var(--t2);margin-bottom:4px">${b.typeData?.n||b.type} · $${b.income}/wk potential</div></div>`;
+  let h=`<div style="text-align:center"><div style="font-size:36px">${bE(b)}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin:4px 0">${b.name}</div><div style="font-size:11px;color:var(--t2);margin-bottom:4px">${bN(b)} · $${b.income}/wk potential</div></div>`;
 
   if(b.owner){
     h+=`<div style="font-size:11px;color:var(--t2);margin-bottom:8px">Controlled by <b>${b.owner.name}</b> (${b.owner.trait})${b.familyIdx!==undefined?' · '+S.city.families[b.familyIdx].name:''}</div>`;
@@ -657,7 +734,8 @@ function takeBlockBuy(blockId){
   if(S.cash<b.owner.sellPrice)return notify('Need $'+b.owner.sellPrice);
   S.cash-=b.owner.sellPrice;b.owned=true;b.owner=null;
   if(b.familyIdx!==undefined){const fam=S.city.families[b.familyIdx];fam.blocks=fam.blocks.filter(id=>id!==b.id);b.familyIdx=undefined}
-  log('Bought '+b.name+'.','v');closeD();upAll();showR('Block Acquired!','🏴',[b.name+' is yours.','Set up an operation for income.'],'OK','');
+  addThreat(2);
+  log('Bought '+b.name+'. +2 threat.','v');closeD();upAll();showR('Block Acquired!','🏴',[b.name+' is yours.','⚠ +2 Threat','Set up an operation!'],'OK','');
 }
 
 function takeBlockIntimidate(blockId){
@@ -701,7 +779,8 @@ function upJobs(){
     const isHot=S.hotTip?.crime===cr.id&&S.hotTip.exp>S.day;const hm=isHot?S.hotTip.mult:1;
     const card=el('div','cd'+(isHot?' dn':''));
     card.innerHTML=`${isHot?'<div style="position:absolute;top:0;right:0;padding:1px 5px;background:var(--rd);color:#fff;font-size:7px;font-weight:700;border-radius:0 0 0 5px">'+hm+'×</div>':''}<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="font-size:26px">${cr.e}</div><div style="flex:1"><div style="font-weight:700;font-size:12px">${cr.n}</div></div><div style="text-align:center"><div class="co ${odds>=70?'h':odds>=50?'m':'l'}" style="font-size:16px">${odds}%</div></div></div><div style="display:flex;gap:3px;font-size:9px;margin-bottom:5px"><div style="flex:1;background:var(--bg);padding:2px;border-radius:3px;text-align:center;color:var(--gd)">$${fmt(cLo*hm)}-${fmt(cHi*hm)}</div><div style="flex:1;background:var(--bg);padding:2px;border-radius:3px;text-align:center;color:var(--cy)">+${cr.xp}XP</div><div style="flex:1;background:var(--bg);padding:2px;border-radius:3px;text-align:center;color:var(--ht)">+${hg}🔥</div></div>`;
-    if(onCD){card.appendChild(el('button','bt','⏳ '+(S.crimeCD[cr.id]-S.day)+'d'));card.lastChild.disabled=true}
+    if(onCD){card.appendChild(el('button','bt','⏳ '+(S.crimeCD[cr.id]-S.day)+'d'));card.lastChild.disabled=true;
+      const adSkip=el('button','bt ad','📺 Skip cooldown');adSkip.onclick=(function(cid){return function(){S.crimeCD[cid]=0;upJobs()}})(cr.id);card.appendChild(adSkip)}
     else{const gb=el('button','bt go',cr.multi?'🎯 Plan':'Do it');gb.onclick=()=>cr.multi?doHeist(cr):doCrime(cr);card.appendChild(gb)}
     tab.appendChild(card);
   });
@@ -797,14 +876,27 @@ function upYou(){
   <div class="cd"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center;font-size:9px"><div style="background:var(--bg);padding:5px;border-radius:4px"><div style="color:var(--t3)">ATK</div><div style="font-size:16px;font-weight:700">${atkT()}</div></div><div style="background:var(--bg);padding:5px;border-radius:4px"><div style="color:var(--t3)">DEF</div><div style="font-size:16px;font-weight:700">${defT()}</div></div><div style="background:var(--bg);padding:5px;border-radius:4px"><div style="color:var(--t3)">SPD</div><div style="font-size:16px;font-weight:700">${S.spd}</div></div></div>${S.sp>0?'<button class="bt go" style="margin-top:4px;text-align:center" onclick="openLU()">★ '+S.sp+'PTS</button>':''}</div>
   <div class="sh">Gear</div><div class="cd"><div style="display:flex;align-items:center;gap:7px;padding:3px 0;border-bottom:1px solid var(--bd)"><div style="font-size:18px">${w?w.e:'🤜'}</div><div style="flex:1;font-size:11px;font-weight:600">${w?w.n:'Fists'}${w?' +'+w.a+'ATK':''}</div>${w?'<button class="bt sm" onclick="ueq(\'w\')">✕</button>':''}</div><div style="display:flex;align-items:center;gap:7px;padding:3px 0"><div style="font-size:18px">${a?a.e:'👕'}</div><div style="flex:1;font-size:11px;font-weight:600">${a?a.n:'Clothes'}${a?' +'+a.d+'DEF':''}</div>${a?'<button class="bt sm" onclick="ueq(\'a\')">✕</button>':''}</div></div>
   <div class="sh">Inventory (${S.inv.length})</div><div class="cd">${S.inv.length?S.inv.map((id,i)=>{const it=ITEMS[id];if(!it)return'';return`<div class="si"><div style="font-size:14px">${it.e}</div><div style="flex:1;font-size:10px;font-weight:600">${it.n} ${it.t==='w'?'+'+it.a+'ATK':it.t==='a'?'+'+it.d+'DEF':it.t==='c'?'+'+it.heal+'HP':'$'+it.v}</div>${it.t==='w'||it.t==='a'?'<button class="bt sm go" onclick="eq('+i+')">⬆</button>':''}${it.t==='c'?'<button class="bt sm" onclick="use('+i+')">Use</button>':''}</div>`}).join(''):'<div style="font-size:9px;color:var(--t3)">Empty.</div>'}</div>
-  <div class="sh">Stats</div><div class="cd" style="font-size:10px;display:grid;grid-template-columns:1fr 1fr;gap:2px"><div>🔫 Crimes: ${S.crimes}</div><div>💀 Kills: ${S.kills}</div><div>💰 Earned: $${fmt(S.lifetimeEarned)}</div><div>🔥 Streak: ${S.maxCombo}×</div><div>🏴 Blocks: ${ownedBlocks()}</div><div>🚔 Jailed: ${S.jails}</div></div>
-  ${S.lv>=15?'<div class="sh">Prestige</div><div class="cd" style="text-align:center"><div style="font-size:28px">♻️</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gd);margin:3px 0">NEW CITY</div><div style="font-size:10px;color:var(--t2);margin-bottom:6px">Reset. Keep +'+((S.prestige+1)*10)+'% cash forever.</div><button class="bt dn" style="text-align:center" onclick="doPrestige()">🔄 Prestige</button></div>':''}
+  <div class="sh">Stats</div><div class="cd" style="font-size:10px;display:grid;grid-template-columns:1fr 1fr;gap:2px"><div>🔫 Crimes: ${S.crimes}</div><div>💀 Kills: ${S.kills}</div><div>💰 Earned: $${fmt(S.lifetimeEarned)}</div><div>🔥 Streak: ${S.maxCombo}×</div><div>🏴 Blocks: ${ownedBlocks()}</div><div>🚔 Jailed: ${S.jails}</div><div>⚠ Threat: ${S.threat}%</div><div>🏙 Cities: ${S.totalCities||0}</div><div>⭐ Respect: ${S.respect}</div><div>♻️ Prestige: ${S.prestige}</div></div>
+  ${S.lv>=5||S.threat>=40?`<div class="sh">Prestige</div><div class="cd${S.threat>=60?' dn':''}" style="text-align:center"><div style="font-size:28px">♻️</div><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gd);margin:3px 0">FLEE TO NEW CITY</div><div style="font-size:10px;color:var(--t2);margin-bottom:4px">Threat is at <b style="color:${threatDesc().clr}">${S.threat}%</b> — ${S.threat>=75?'the walls are closing in.':S.threat>=50?'feds are watching.':'the city gets hotter.'}</div><div style="font-size:10px;color:var(--t2);margin-bottom:6px">Keep: <b style="color:var(--gd)">+${(S.prestige+1)*10}% cash</b>, <b>+${S.prestige+1} starting ATK/DEF</b>, <b>$${100*(S.prestige+1)} starting cash</b>.</div><div style="font-size:9px;color:var(--t3);margin-bottom:6px">Cities conquered: ${S.totalCities||0}</div><button class="bt dn" style="text-align:center" onclick="confirmPrestige()">🔄 Prestige — New City</button></div>`:''}
   <div class="cd" style="display:flex;gap:3px"><button class="bt" style="flex:1;text-align:center" onclick="save();notify('Saved')">💾</button><button class="bt dn" style="flex:1;text-align:center" onclick="confirmNew()">⚠ NEW</button></div>`;
 }
 function eq(i){const id=S.inv[i],it=ITEMS[id];if(!it)return;const s=it.t==='w'?'w':it.t==='a'?'a':null;if(!s)return;if(S.gear[s])S.inv.push(S.gear[s]);S.gear[s]=id;S.inv.splice(i,1);upAll()}
 function ueq(s){if(!S.gear[s])return;S.inv.push(S.gear[s]);S.gear[s]=null;upAll()}
 function use(i){const id=S.inv[i],it=ITEMS[id];if(!it?.heal)return;S.hp=Math.min(S.mhp,S.hp+it.heal);S.inv.splice(i,1);juice('heal',it.heal);upAll()}
-function doPrestige(){const p=S.prestige+1,lt=S.lifetimeEarned,mc=S.maxCombo,nm=S.name;S=clone(BASE);S.name=nm;S.prestige=p;S.lifetimeEarned=lt;S.maxCombo=mc;S.city=genCity();log('♻️ Prestige '+p+'! Welcome to '+S.city.name+'.','q');upAll();sw('hub');showR('PRESTIGE '+p,'♻️',['New city: '+S.city.name,'+'+p*10+'% cash forever'],'OK','')}
+function confirmPrestige(){
+  const p=S.prestige+1;const td=threatDesc();
+  openD(`<div style="text-align:center"><div style="font-size:48px;margin-bottom:4px">♻️</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gd);letter-spacing:2px;margin-bottom:6px">PRESTIGE ${p}</div><div style="font-size:11px;color:var(--t2);margin-bottom:8px">Current threat: <b style="color:${td.clr}">${S.threat}% — ${td.n}</b></div><div style="font-size:11px;color:var(--t2);margin-bottom:4px;text-align:left"><b>You keep:</b></div><div style="font-size:10px;color:var(--t1);text-align:left;margin-bottom:8px;padding:6px;background:var(--bg);border-radius:4px">💰 +${p*10}% cash on all earnings<br>⚔ +${p} starting ATK & DEF<br>💵 $${100*p} starting cash<br>⭐ Respect carries over (${S.respect})<br>📊 Lifetime stats preserved</div><div style="font-size:11px;color:var(--t2);margin-bottom:8px;text-align:left"><b>You lose:</b> All blocks, operations, soldiers, crew, gear, inventory, level, heat, threat.</div><button class="bt go" style="text-align:center" onclick="doPrestige()">🌃 Move to ${rA(CITY_PRE)+rA(CITY_NAMES)}</button><button class="bt" style="text-align:center" onclick="closeD()">Stay</button></div>`);
+}
+function doPrestige(){
+  const p=S.prestige+1,lt=S.lifetimeEarned,mc=S.maxCombo,nm=S.name,tc=(S.totalCities||0)+1,rep=Math.floor(S.respect*.5);
+  closeD();S=clone(BASE);S.name=nm;S.prestige=p;S.lifetimeEarned=lt;S.maxCombo=mc;S.totalCities=tc;
+  // Prestige bonuses — compound across resets
+  S.atk+=p;S.def+=p;S.cash=50+100*p;S.respect=rep;
+  S.city=genCity();
+  log('♻️ Prestige '+p+'! Welcome to '+S.city.name+'.','q');
+  log('Cities conquered: '+tc+'. Permanent +'+p*10+'% cash.','q');
+  upAll();sw('hub');showR('PRESTIGE '+p,'♻️',['🌃 New city: '+S.city.name,'💰 +'+p*10+'% cash forever','⚔ +'+p+' ATK & DEF','💵 Starting cash: $'+S.cash,'🏙 Cities conquered: '+tc],'OK','');
+}
 
 // ======================================================
 // LOG
@@ -837,11 +929,11 @@ function cRound(action){
     const wb=el('button','bt go','OK');wb.style.textAlign='center';
     wb.onclick=()=>{$('CO').style.display='none';
       // Block capture on combat win
-      if(combat.ctx.startsWith('block_')){const bid=parseInt(combat.ctx.replace('block_',''));const b=S.city?.blocks.find(x=>x.id===bid);if(b){b.owned=true;if(b.familyIdx!==undefined){S.city.families[b.familyIdx].blocks=S.city.families[b.familyIdx].blocks.filter(id=>id!==b.id);b.familyIdx=undefined}b.owner=null;S.respect+=2;showR('Block Taken!','🏴',[b.name+' is yours.','+2 Respect','Set up an operation!'],'OK','upAll()');return}}
+      if(combat.ctx.startsWith('block_')){const bid=parseInt(combat.ctx.replace('block_',''));const b=S.city?.blocks.find(x=>x.id===bid);if(b){b.owned=true;if(b.familyIdx!==undefined){S.city.families[b.familyIdx].blocks=S.city.families[b.familyIdx].blocks.filter(id=>id!==b.id);b.familyIdx=undefined}b.owner=null;S.respect+=2;addThreat(3);showR('Block Taken!','🏴',[b.name+' is yours.','+2 Respect','⚠ +3 Threat'],'OK','upAll()');return}}
       // Family boss damage
       if(combat.ctx.startsWith('fam_')){const fi=parseInt(combat.ctx.replace('fam_',''));const fam=S.city?.families[fi];if(fam){const dmg=rnd(25,45)+S.lv*4;fam.bossHP=Math.max(0,fam.bossHP-dmg);if(fam.bossHP<=0){const bounty=300*(fi+1);S.cash+=bounty;S.earned+=bounty;S.lifetimeEarned+=bounty;S.respect+=10;// Release their blocks
           fam.blocks.forEach(bid=>{const b=S.city.blocks.find(x=>x.id===bid);if(b){b.familyIdx=undefined;b.owner={name:mkN(),trait:rA(TRAITS),str:rnd(10,25),willSell:R()<.5,sellPrice:rnd(60,150)}}});
-          fam.blocks=[];log('💀 '+fam.boss+' ELIMINATED!','q');showR('BOSS DOWN!','💀',[fam.boss+' is finished.','+$'+fmt(bounty),'+10 Respect','Their blocks are up for grabs!'],'OK','upAll()',bounty);return}
+          fam.blocks=[];log('💀 '+fam.boss+' ELIMINATED!','q');addThreat(8);showR('BOSS DOWN!','💀',[fam.boss+' is finished.','+$'+fmt(bounty),'+10 Respect','⚠ +8 Threat — the city notices'],'OK','upAll()',bounty);return}
         else log('Damaged '+fam.boss+'. -'+dmg+'HP.','v')}}
       if(combat.ctx==='police'){S.jails++;S.heat=Math.max(0,S.heat-25)}
       upAll();showR('Victory!','🏆',['+$'+g,'+'+xp+' XP'],'OK','')};
@@ -850,7 +942,45 @@ function cRound(action){
   combat.enemies.forEach(e=>{if(e.hp<=0)return;const tgts=[{n:S.name,ref:'p'},...S.circle.filter(c=>c.hp>0).map(c=>({n:c.name,ref:c}))];const t=rA(tgts);const dv=t.ref==='p'?defT():(t.ref.d||0);let d=Math.max(1,e.a-Math.floor(dv/2)+rnd(-1,2));
     if(t.ref==='p'&&hasAb('bodyguard')&&R()<.25){const bg=S.circle.find(c=>c.hp>0&&c.ab==='bodyguard');if(bg){bg.hp=Math.max(0,bg.hp-d);combat.log.push(bg.name.split(' ')[0]+' blocks! -'+d);if(bg.hp<=0){combat.log.push(bg.name.split(' ')[0]+' DOWN!');log('💀 '+bg.name+' killed!','c')}return}}
     if(t.ref==='p'){S.hp=Math.max(0,S.hp-d);combat.log.push(e.name+'→You -'+d)}else{t.ref.hp=Math.max(0,t.ref.hp-d);combat.log.push(e.name+'→'+t.n.split(' ')[0]+' -'+d);if(t.ref.hp<=0){combat.log.push(t.n.split(' ')[0]+' DOWN!');log('💀 '+t.n+' killed!','c')}}});
-  if(S.hp<=0){combat.done=true;S.hp=1;const lost=Math.floor(S.cash*.2);S.cash=Math.max(0,S.cash-lost);S.combo=0;renderC();$('CA').innerHTML='';const wb=el('button','bt dn','Accept');wb.style.textAlign='center';wb.onclick=()=>{$('CO').style.display='none';if(combat.ctx==='police'){S.jails++;S.heat=Math.max(0,S.heat-30)}log('Defeated. -$'+lost,'c');upAll();showR('Defeated','💀',['-$'+lost],'OK','')};$('CA').appendChild(wb);return}
+  if(S.hp<=0){combat.done=true;const lost=Math.floor(S.cash*.25);S.cash=Math.max(0,S.cash-lost);S.combo=0;
+    // INJURY SEVERITY — makes defeat matter
+    const severity=R();let injuryText,injuryLines=[];
+    if(severity<.08&&S.lv>3){
+      // DEATH — game over. Restart with some prestige benefit
+      renderC();$('CA').innerHTML='';
+      const wb=el('button','bt dn','💀 You died.');wb.style.textAlign='center';
+      wb.onclick=()=>{$('CO').style.display='none';
+        showR('DEAD','💀',['You bled out on the street.','The city moves on without you.','Your reputation lives on...'],'Start Over','doNew()')};
+      $('CA').appendChild(wb);
+      log('💀 '+S.name+' is dead.','c');return;
+    } else if(severity<.25){
+      // CRITICAL — lose a stat point permanently, long recovery
+      const stat=rA(['atk','def','spd']);S[stat]=Math.max(1,S[stat]-1);
+      S.hp=Math.max(1,Math.floor(S.mhp*.15));S.day+=rnd(2,4);S.workedDay=S.day;
+      injuryText='CRITICAL INJURY';
+      injuryLines=['-$'+lost,'💀 Permanent -1 '+stat.toUpperCase(),'🏥 Hospitalized '+rnd(2,4)+' days','HP set to 15%'];
+      log('🏥 Critical injury. -1 '+stat.toUpperCase()+'. Hospitalized.','c');
+    } else if(severity<.55){
+      // SERIOUS — HP halved, lose days
+      S.hp=Math.max(1,Math.floor(S.mhp*.3));S.day+=rnd(1,2);S.workedDay=S.day;
+      injuryText='SERIOUS INJURY';
+      injuryLines=['-$'+lost,'🏥 Recovering '+rnd(1,2)+' days','HP set to 30%'];
+      log('🏥 Serious injury. Recovering.','c');
+    } else {
+      // MINOR — knocked out, lose cash
+      S.hp=Math.max(1,Math.floor(S.mhp*.5));
+      injuryText='KNOCKED OUT';
+      injuryLines=['-$'+lost,'Bruised but alive.','HP set to 50%'];
+      log('Knocked out. -$'+lost+'.','c');
+    }
+    if(combat.ctx==='police'){S.jails++;S.heat=Math.max(0,S.heat-30);injuryLines.push('🚔 Arrested — -30 heat');log('Arrested.','c')}
+    // Circle members might die
+    S.circle.forEach(c=>{if(c.hp<=0)log('💀 '+c.name+' killed!','c')});
+    S.circle=S.circle.filter(c=>c.hp>0);
+    renderC();$('CA').innerHTML='';
+    const wb=el('button','bt dn','Accept');wb.style.textAlign='center';
+    wb.onclick=()=>{$('CO').style.display='none';dayTick();upAll();showR(injuryText,'🏥',injuryLines,'OK','')};
+    $('CA').appendChild(wb);return}
   S.circle=S.circle.filter(c=>c.hp>0);renderC();
 }
 function escapeBonus(){return (hasAb('getaway')?30:0)+S.spd*5}
@@ -886,16 +1016,57 @@ function dayTick(){
     S.circle.forEach(c=>{c.loy=Math.max(0,c.loy-rnd(2,5));if(c.loy<=15&&R()<.3){log('💔 '+c.name+' betrayed you!','c');S.circle=S.circle.filter(x=>x!==c)}});
     // Rival family expansion — they fight back!
     if(S.city)S.city.families.forEach((f,fi)=>{if(f.bossHP<=0||!f.hostile)return;
-      // Attack random owned block
       const myBlocks=S.city.blocks.filter(b=>b.owned);
-      if(myBlocks.length&&R()<.15+fi*.05){
+      // Attack frequency scales with threat
+      if(myBlocks.length&&R()<threatAttackChance()+fi*.03){
         const target=rA(myBlocks);
         if(S.soldiers>0&&R()<.6){S.soldiers--;log('⚔ '+f.name+' attacked '+target.name+'! Defended (lost 1 soldier).','c')}
-        else{target.owned=false;target.op=null;target.familyIdx=fi;f.blocks.push(target.id);target.owner={name:rA(FM)+' '+f.name.split(' ')[1],trait:rA(TRAITS),str:rnd(20,40)};log('⚔ '+f.name+' TOOK '+target.name+'!','c')}
+        else{target.owned=false;target.op=null;target.blockLv=1;target.familyIdx=fi;f.blocks.push(target.id);target.owner={name:rA(FM)+' '+f.name.split(' ')[1],trait:rA(TRAITS),str:rnd(20,40)};log('⚔ '+f.name+' TOOK '+target.name+'!','c')}
       }
-      // Soldier attrition
       if(S.soldiers>0&&R()<.05){S.soldiers--;log('💀 Soldier killed in skirmish.','c')}
     });
+
+    // THREAT CONSEQUENCES — the permanent escalation
+    // Threat 25+: Rivals get more aggressive (already handled above via threatAttackChance)
+    // Threat grows passively from owning things
+    const opsRunning=S.city?S.city.blocks.filter(b=>b.owned&&b.op).length:0;
+    if(opsRunning>0)addThreat(Math.ceil(opsRunning/4));// +1 threat per 4 ops per week
+
+    // Threat 50+: FBI — random chance to freeze a business temporarily
+    if(S.threat>=50&&R()<threatEventChance()&&!S.pendingEvent){
+      const biz=S.city?S.city.blocks.filter(b=>b.owned&&b.op):[];
+      if(biz.length){
+        const target=rA(biz);const opName=OPS.find(x=>x.id===target.op)?.n||'operation';
+        S.pendingEvent={title:'🕵 FBI INVESTIGATION',desc:'Feds are looking into your '+opName+' on '+target.name+'.',
+          opts:[{label:'Shut it down (lose op, -5 threat)',fn:()=>{target.op=null;S.threat=Math.max(0,S.threat-5);log('Shut down '+opName+' on '+target.name+' to avoid feds.','c')}},
+                {label:'Bribe agent $'+Math.floor(S.threat*5)+' (risky)',fn:()=>{const cost=Math.floor(S.threat*5);if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;if(R()<.6){log('Bribed the fed. For now.','v')}else{target.op=null;S.heat=Math.min(100,S.heat+15);log('Bribe failed! Op shut down. +15 heat.','c')}}},
+                {label:'Ignore it',fn:()=>{if(R()<.4){target.op=null;target.owned=false;S.heat=Math.min(100,S.heat+20);log('🚨 FBI seized '+target.name+'!','c')}else log('Feds backed off. For now.','v')}}]};
+      }
+    }
+
+    // Threat 75+: RICO — chance to lose a business entirely
+    if(S.threat>=75&&R()<.06&&!S.pendingEvent){
+      const owned=S.city?S.city.blocks.filter(b=>b.owned):[];
+      if(owned.length>2){
+        const numSeized=rnd(1,Math.min(2,owned.length-1));
+        const targets=[];for(let i=0;i<numSeized;i++){const t=rA(owned.filter(b=>!targets.includes(b)));if(t)targets.push(t)}
+        S.pendingEvent={title:'⚖ RICO INDICTMENT',desc:'Federal prosecutors are building a case. '+numSeized+' block(s) at risk of seizure.',
+          opts:[{label:'Lawyer up $'+Math.floor(S.threat*8)+' (fight it)',fn:()=>{const cost=Math.floor(S.threat*8);if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;if(R()<.5){log('Lawyers beat the case.','v');S.respect+=3}else{targets.forEach(t=>{t.owned=false;t.op=null;t.blockLv=1});log('⚖ RICO! Lost '+numSeized+' blocks.','c')}}},
+                {label:'Prestige out — flee the city',fn:()=>{doPrestige()}}]};
+      }
+    }
+
+    // Threat 90+: CRACKDOWN — massive raid, soldiers killed, cash seized
+    if(S.threat>=90&&R()<.08&&!S.pendingEvent){
+      const seized=Math.floor(S.cash*.3);const solLost=Math.ceil(S.soldiers*.4);
+      S.pendingEvent={title:'🔴 GOVERNMENT CRACKDOWN',desc:'Task force raid. Military-grade operation. They\'re taking everything.',
+        opts:[{label:'Fight back (combat, +heat)',fn:()=>{S.cash=Math.max(0,S.cash-seized);S.soldiers=Math.max(0,S.soldiers-solLost);S.heat=Math.min(100,S.heat+20);log('🔴 Crackdown! -$'+seized+', -'+solLost+' soldiers, +20 heat.','c');startCombat([mkE('swat'),mkE('swat'),mkE('cop')],'crackdown')}},
+              {label:'Go underground — lay low',fn:()=>{S.cash=Math.max(0,S.cash-seized);S.soldiers=Math.max(0,S.soldiers-solLost);// Lose random blocks
+                const owned=S.city?S.city.blocks.filter(b=>b.owned):[];const lose=Math.min(3,owned.length);
+                for(let i=0;i<lose;i++){const t=rA(owned.filter(b=>b.owned));if(t){t.owned=false;t.op=null;t.blockLv=1}}
+                S.heat=0;log('🔴 Crackdown! Lost $'+seized+', '+solLost+' soldiers, '+lose+' blocks. Heat cleared.','c')}},
+              {label:'🔄 Prestige — flee to new city',fn:()=>{doPrestige()}}]};
+    }
   }
 
   // Hot tip
@@ -914,17 +1085,28 @@ function genEvent(){
   if(S.heat>=30)pool.push('cop_shake');
   if(ownedBlocks()>0)pool.push('turf_hit');
   pool.push('opportunity');
+  if(S.threat>=30)pool.push('informant');
+  if(S.threat>=50)pool.push('witness');
+  if(S.threat>=60)pool.push('asset_freeze');
   if(!pool.length)return;
   const evId=rA(pool);let title,desc,opts;
   switch(evId){
     case'arrest':{const c=rA(S.circle);const bail=rnd(50,150);title='🚔 ARRESTED';desc=c.name+' got picked up.';opts=[{label:'Pay bail $'+bail,fn:()=>{if(S.cash<bail)return notify('Need $'+bail);S.cash-=bail;c.loy=Math.min(100,c.loy+15)}},{label:'Let them rot',fn:()=>{S.circle=S.circle.filter(x=>x!==c)}}];break}
     case'betray':{const c=rA(S.circle);const stolen=rnd(30,100);title='💔 BETRAYAL';desc=c.name+' is skimming!';opts=[{label:'Confront (fight)',fn:()=>startCombat([mkE('enforcer')],'betray')},{label:'Forgive -$'+stolen,fn:()=>{S.cash=Math.max(0,S.cash-stolen);c.loy=Math.min(100,c.loy+20)}}];break}
-    case'alliance':{title='🤝 ALLIANCE OFFER';desc='A rival wants peace.';opts=[{label:'Accept (-10 heat)',fn:()=>{S.heat=Math.max(0,S.heat-10)}},{label:'Refuse (+5 respect)',fn:()=>{S.respect+=5}}];break}
-    case'cop_shake':{const cost=rnd(40,120);title='👮 SHAKEDOWN';desc='Cop wants more.';opts=[{label:'Pay $'+cost,fn:()=>{if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;S.heat=Math.max(0,S.heat-8)}},{label:'Threaten (+10 heat, +3 rep)',fn:()=>{S.heat=Math.min(100,S.heat+10);S.respect+=3}}];break}
-    case'turf_hit':{const blocks=S.city?S.city.blocks.filter(b=>b.owned):[];if(!blocks.length)return;const b=rA(blocks);title='⚔ TURF ATTACK';desc='Rivals hitting '+b.name+'!';opts=[{label:'Defend (fight)',fn:()=>startCombat([mkE('rival'),mkE('gang')],'block_def')},{label:'Abandon block',fn:()=>{b.owned=false;b.op=null}}];break}
-    case'opportunity':{const cash=rnd(80,300);title='💰 OPPORTUNITY';desc='Quick score dropped in your lap.';opts=[{label:'Take it',fn:()=>{if(R()<.6){S.cash+=cash;S.earned+=cash;S.lifetimeEarned+=cash;juice('cash',cash)}else{S.hp=Math.max(1,S.hp-rnd(5,15));S.heat=Math.min(100,S.heat+5)}}},{label:'Pass',fn:()=>{}}];break}
+    case'alliance':{title='🤝 ALLIANCE';desc='A rival wants peace.';opts=[{label:'Accept (-10 heat)',fn:()=>{S.heat=Math.max(0,S.heat-10)}},{label:'Refuse (+5 respect)',fn:()=>{S.respect+=5}}];break}
+    case'cop_shake':{const cost=rnd(40,120);title='👮 SHAKEDOWN';desc='Cop wants more.';opts=[{label:'Pay $'+cost,fn:()=>{if(S.cash<cost)return notify('Need $'+cost);S.cash-=cost;S.heat=Math.max(0,S.heat-8)}},{label:'Threaten (+heat +rep)',fn:()=>{S.heat=Math.min(100,S.heat+10);S.respect+=3}}];break}
+    case'turf_hit':{const blocks=S.city?S.city.blocks.filter(b=>b.owned):[];if(!blocks.length)return;const b=rA(blocks);title='⚔ TURF ATTACK';desc='Rivals hitting '+b.name+'!';opts=[{label:'Defend (fight)',fn:()=>startCombat([mkE('rival'),mkE('gang')],'block_def')},{label:'Abandon block',fn:()=>{b.owned=false;b.op=null;b.blockLv=1}}];break}
+    case'opportunity':{const cash=rnd(80,300);title='💰 OPPORTUNITY';desc='Quick score.';opts=[{label:'Take it',fn:()=>{if(R()<.6){S.cash+=cash;S.earned+=cash;S.lifetimeEarned+=cash;juice('cash',cash);log('+$'+cash,'v')}else{S.hp=Math.max(1,S.hp-rnd(5,15));S.heat=Math.min(100,S.heat+5);log('Went bad.','c')}}},{label:'Pass',fn:()=>{}}];break}
+    case'informant':{title='🐀 INFORMANT';desc='Someone is talking to the feds.';
+      if(S.circle.length){const suspect=rA(S.circle);const real=R()<.5;
+        opts=[{label:'Eliminate '+suspect.name.split(' ')[0],fn:()=>{S.circle=S.circle.filter(x=>x!==suspect);if(real){S.threat=Math.max(0,S.threat-3);log('Found the rat. -3 threat.','v')}else{log('Killed '+suspect.name+'. Innocent.','c');S.circle.forEach(c=>c.loy=Math.max(0,c.loy-15))}}},{label:'Ignore',fn:()=>{if(real){addThreat(3);log('Informant keeps feeding. +3 threat.','c')}}}]}
+      else opts=[{label:'Stay vigilant',fn:()=>addThreat(1)}];break}
+    case'witness':{const bc=rnd(100,300);title='👁 WITNESS';desc='Someone saw too much.';
+      opts=[{label:'Pay off $'+bc,fn:()=>{if(S.cash<bc)return notify('Need $'+bc);S.cash-=bc;log('Witness handled.','v')}},{label:'Intimidate (+heat +threat)',fn:()=>{S.heat=Math.min(100,S.heat+8);addThreat(2);log('Witness intimidated.','v')}},{label:'Ignore',fn:()=>{addThreat(4);log('Witness testified. +4 threat.','c')}}];break}
+    case'asset_freeze':{const frozen=Math.floor(S.cash*.2);title='🏦 ASSET FREEZE';desc='$'+frozen+' frozen by federal order.';
+      opts=[{label:'Accept',fn:()=>{S.cash=Math.max(0,S.cash-frozen);log('$'+frozen+' seized.','c')}},{label:'Lawyer $'+Math.floor(frozen*.3),fn:()=>{const lc=Math.floor(frozen*.3);if(S.cash<lc)return notify('Need $'+lc);S.cash-=lc;if(R()<.5)log('Lawyers saved it.','v');else{S.cash=Math.max(0,S.cash-frozen);log('Lawyers failed. $'+frozen+' gone.','c')}}}];break}
   }
-  S.pendingEvent={title,desc,opts};
+  if(title)S.pendingEvent={title,desc,opts};
 }
 
 // ======================================================
